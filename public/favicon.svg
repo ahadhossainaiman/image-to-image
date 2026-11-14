@@ -1,0 +1,68 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <defs>
+    <!-- Luxury Gold Gradient -->
+    <linearGradient id="goldGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FFF2D6" />
+      <stop offset="25%" stop-color="#E7C278" />
+      <stop offset="65%" stop-color="#C59648" />
+      <stop offset="100%" stop-color="#936727" />
+    </linearGradient>
+
+    <!-- Deep Atelier Forest Gradient -->
+    <radialGradient id="forestGlow" cx="50%" cy="40%" r="60%">
+      <stop offset="0%" stop-color="#1B3828" />
+      <stop offset="70%" stop-color="#13261C" />
+      <stop offset="100%" stop-color="#0B1711" />
+    </radialGradient>
+
+    <!-- Star Glow -->
+    <radialGradient id="centerGlow" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#FFF8E7" stop-opacity="0.9" />
+      <stop offset="40%" stop-color="#E7C278" stop-opacity="0.4" />
+      <stop offset="100%" stop-color="#C59648" stop-opacity="0" />
+    </radialGradient>
+  </defs>
+
+  <!-- Circular Forest Badge -->
+  <circle cx="32" cy="32" r="30" fill="url(#forestGlow)" stroke="url(#goldGrad)" stroke-width="1.75" />
+  
+  <!-- Outer Filigree Ring -->
+  <circle cx="32" cy="32" r="26.5" fill="none" stroke="url(#goldGrad)" stroke-width="0.6" stroke-dasharray="1.5 2.5" opacity="0.65" />
+
+  <!-- Soft Central Halo -->
+  <circle cx="32" cy="32" r="14" fill="url(#centerGlow)" />
+
+  <!-- Diagonal Star Rays (Secondary 45-degree ray burst) -->
+  <g transform="rotate(45 32 32)">
+    <path
+      d="M 32 17 Q 32 32 17 32 Q 32 32 32 47 Q 32 32 47 32 Q 32 32 32 17 Z"
+      fill="url(#goldGrad)"
+      opacity="0.8"
+    />
+  </g>
+
+  <!-- Primary 8-Point Atelier Star (Vertical & Horizontal major rays) -->
+  <path
+    d="M 32 10 Q 32 32 10 32 Q 32 32 32 54 Q 32 32 54 32 Q 32 32 32 10 Z"
+    fill="url(#goldGrad)"
+  />
+
+  <!-- Atelier Sparkle Accents (Fairy Magic) -->
+  <!-- Top Right Sparkle -->
+  <path
+    d="M 46 15 Q 46 20 41 20 Q 46 20 46 25 Q 46 20 51 20 Q 46 20 46 15 Z"
+    fill="url(#goldGrad)"
+    opacity="0.85"
+  />
+
+  <!-- Bottom Left Sparkle -->
+  <path
+    d="M 18 43 Q 18 46 15 46 Q 18 46 18 49 Q 18 46 21 46 Q 18 46 18 43 Z"
+    fill="url(#goldGrad)"
+    opacity="0.75"
+  />
+
+  <!-- Radiant Diamond Center -->
+  <circle cx="32" cy="32" r="2.2" fill="#FFFFFF" />
+</svg>
+
