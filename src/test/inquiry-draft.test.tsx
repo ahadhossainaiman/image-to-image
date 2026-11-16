@@ -14,9 +14,9 @@ describe("inquiry phone draft", () => {
 
   it("saves a telephone number with the existing inquiry values and restores it", () => {
     const view = render(<Contact />);
-    fireEvent.change(screen.getByLabelText("Your name"), { target: { value: "Collector" } });
-    fireEvent.change(screen.getByLabelText("Email address"), { target: { value: "collector@example.com" } });
-    fireEvent.change(screen.getByLabelText("Tell us your story"), { target: { value: "A woodland commission" } });
+    fireEvent.change(screen.getByLabelText(/Your name/), { target: { value: "Collector" } });
+    fireEvent.change(screen.getByLabelText(/Email address/), { target: { value: "collector@example.com" } });
+    fireEvent.change(screen.getByLabelText(/Tell us your story/), { target: { value: "A woodland commission" } });
     fireEvent.change(screen.getByLabelText("Phone Number"), { target: { value: "+44 7700 900123" } });
     fireEvent.click(screen.getByRole("button", { name: "Save inquiry draft" }));
     const draft = JSON.parse(window.localStorage.getItem("thoa-inquiry-draft") ?? "{}");

@@ -30,7 +30,9 @@ export function Contact() {
         if (name === "piece" && piece) continue;
         const field = formRef.current?.querySelector(`[name="${name}"]`);
         if (field instanceof HTMLInputElement || field instanceof HTMLTextAreaElement || field instanceof HTMLSelectElement) {
-          field.value = String(value);
+          field.value = field instanceof HTMLTextAreaElement && field.maxLength > 0
+            ? String(value).slice(0, field.maxLength)
+            : String(value);
         }
       }
       setSaved(true);
@@ -50,7 +52,7 @@ export function Contact() {
   return (
     <div className="mx-auto max-w-[1300px] px-5 py-16 sm:px-10 lg:py-24">
       <header className="mx-auto max-w-3xl text-center">
-        <div className="botanical-rule mx-auto w-fit eyebrow">Private commissions & acquisitions</div>
+        <div className="botanical-rule mx-auto w-fit eyebrow">Private commissions</div>
         <h1 className="mt-6 text-6xl leading-[.95] sm:text-7xl">Let us imagine<br /><em className="text-accent">something together.</em></h1>
         <p className="mx-auto mt-7 max-w-xl text-sm leading-7 text-muted-foreground">Tell us about the artwork that caught your eye, your space, or the story you would like us to bring to life.</p>
       </header>
@@ -66,14 +68,13 @@ export function Contact() {
           </div>
         </aside>
         <form ref={formRef} onSubmit={saveDraft} className="glass-panel p-7 sm:p-10">
+          {piece && <input type="hidden" name="piece" value={piece} />}
           <div className="flex items-center justify-between gap-5 border-b border-border pb-6"><div><p className="eyebrow">Your vision</p><h2 className="mt-2 text-3xl">Prepare your inquiry</h2></div><span className="hidden text-[9px] uppercase tracking-[.16em] text-muted-foreground sm:block">Private by nature</span></div>
           <div className="mt-7 grid gap-6 sm:grid-cols-2">
-            <label className="text-[10px] uppercase tracking-[.16em] text-muted-foreground">Your name<input name="name" required autoComplete="name" className="input-art mt-3 normal-case tracking-normal" placeholder="How shall we address you?" /></label>
-            <label className="text-[10px] uppercase tracking-[.16em] text-muted-foreground">Email address<input name="email" required type="email" autoComplete="email" className="input-art mt-3 normal-case tracking-normal" placeholder="you@example.com" /></label>
+            <label className="text-[10px] uppercase tracking-[.16em] text-muted-foreground">Your name <span aria-hidden="true" className="text-accent">*</span><input name="name" required autoComplete="name" className="input-art mt-3 normal-case tracking-normal" placeholder="How shall we address you?" /></label>
+            <label className="text-[10px] uppercase tracking-[.16em] text-muted-foreground">Email address <span aria-hidden="true" className="text-accent">*</span><input name="email" required type="email" autoComplete="email" className="input-art mt-3 normal-case tracking-normal" placeholder="you@example.com" /></label>
             <label className="text-[10px] uppercase tracking-[.16em] text-muted-foreground sm:col-span-2">Phone Number<input name="phone" type="tel" autoComplete="tel" className="input-art mt-3 normal-case tracking-normal" placeholder="Enter your phone number" /></label>
-            <label className="text-[10px] uppercase tracking-[.16em] text-muted-foreground sm:col-span-2">I am interested in<select name="interest" defaultValue={piece ? "acquisition" : "commission"} className="input-art mt-3 normal-case tracking-normal"><option value="commission">A bespoke commission</option><option value="acquisition">Acquiring an existing artwork</option><option value="viewing">A private viewing</option></select></label>
-            <label className="text-[10px] uppercase tracking-[.16em] text-muted-foreground sm:col-span-2">Artwork or collection<input name="piece" defaultValue={piece ?? ""} className="input-art mt-3 normal-case tracking-normal" placeholder="A title, collection, or leave open for a commission" /></label>
-            <label className="text-[10px] uppercase tracking-[.16em] text-muted-foreground sm:col-span-2">Tell us your story<textarea name="vision" required rows={6} className="input-art mt-3 resize-none normal-case leading-6 tracking-normal" placeholder="The feeling, scale, materials or occasion you have in mind…" /></label>
+            <label className="text-[10px] uppercase tracking-[.16em] text-muted-foreground sm:col-span-2">Tell us your story <span aria-hidden="true" className="text-accent">*</span><textarea name="vision" required maxLength={1000} rows={1} className="input-art mt-3 h-[50px] min-h-[50px] resize-y normal-case leading-normal tracking-normal" placeholder="The feeling, scale, materials or occasion you have in mind…" /></label>
           </div>
           <Button type="submit" className="btn-art mt-8 h-auto w-full rounded-none">Save inquiry draft <Save className="h-4 w-4" strokeWidth={1.2} /></Button>
           <p className="mt-4 text-center text-[10px] leading-5 text-muted-foreground">This saves a draft on your device only. Direct atelier delivery has not been connected, so no message is sent.</p>

@@ -11,6 +11,8 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AboutRouteImport } from './routes/about'
+import { Route as AboutCreatorsRouteImport } from './routes/about-creators'
+import { Route as AtelierStoryRouteImport } from './routes/atelier-story'
 import { Route as CartRouteImport } from './routes/cart'
 import { Route as ContactRouteImport } from './routes/contact'
 import { Route as ShopRouteImport } from './routes/shop'
@@ -25,6 +27,16 @@ const IndexRoute = IndexRouteImport.update({
 const AboutRoute = AboutRouteImport.update({
   id: '/about',
   path: '/about',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AboutCreatorsRoute = AboutCreatorsRouteImport.update({
+  id: '/about-creators',
+  path: '/about-creators',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AtelierStoryRoute = AtelierStoryRouteImport.update({
+  id: '/atelier-story',
+  path: '/atelier-story',
   getParentRoute: () => rootRouteImport,
 } as any)
 const CartRoute = CartRouteImport.update({
@@ -56,6 +68,8 @@ const CollectionsSlugRoute = CollectionsSlugRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
+  '/about-creators': typeof AboutCreatorsRoute
+  '/atelier-story': typeof AtelierStoryRoute
   '/cart': typeof CartRoute
   '/contact': typeof ContactRoute
   '/shop': typeof ShopRoute
@@ -65,6 +79,8 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
+  '/about-creators': typeof AboutCreatorsRoute
+  '/atelier-story': typeof AtelierStoryRoute
   '/cart': typeof CartRoute
   '/contact': typeof ContactRoute
   '/shop': typeof ShopRoute
@@ -75,6 +91,8 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
+  '/about-creators': typeof AboutCreatorsRoute
+  '/atelier-story': typeof AtelierStoryRoute
   '/cart': typeof CartRoute
   '/contact': typeof ContactRoute
   '/shop': typeof ShopRoute
@@ -86,6 +104,8 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/about'
+    | '/about-creators'
+    | '/atelier-story'
     | '/cart'
     | '/contact'
     | '/shop'
@@ -95,6 +115,8 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/about'
+    | '/about-creators'
+    | '/atelier-story'
     | '/cart'
     | '/contact'
     | '/shop'
@@ -104,6 +126,8 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/about'
+    | '/about-creators'
+    | '/atelier-story'
     | '/cart'
     | '/contact'
     | '/shop'
@@ -114,6 +138,8 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AboutRoute: typeof AboutRoute
+  AboutCreatorsRoute: typeof AboutCreatorsRoute
+  AtelierStoryRoute: typeof AtelierStoryRoute
   CartRoute: typeof CartRoute
   ContactRoute: typeof ContactRoute
   ShopRoute: typeof ShopRoute
@@ -135,6 +161,20 @@ declare module '@tanstack/react-router' {
       path: '/about'
       fullPath: '/about'
       preLoaderRoute: typeof AboutRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/about-creators': {
+      id: '/about-creators'
+      path: '/about-creators'
+      fullPath: '/about-creators'
+      preLoaderRoute: typeof AboutCreatorsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/atelier-story': {
+      id: '/atelier-story'
+      path: '/atelier-story'
+      fullPath: '/atelier-story'
+      preLoaderRoute: typeof AtelierStoryRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/cart': {
@@ -178,6 +218,8 @@ declare module '@tanstack/react-router' {
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AboutRoute: AboutRoute,
+  AboutCreatorsRoute: AboutCreatorsRoute,
+  AtelierStoryRoute: AtelierStoryRoute,
   CartRoute: CartRoute,
   ContactRoute: ContactRoute,
   ShopRoute: ShopRoute,

@@ -4,8 +4,27 @@ export type CollectorReview = {
   quote: string;
   stars: number;
   attribution: string;
+  reviewerName?: string;
+  location?: string;
   theme: "dark" | "light";
 };
+
+// Legacy CMS imports combine the details with a dot or a spaced dash.
+export function getCollectorIdentity(
+  review: Pick<CollectorReview, "reviewerName" | "location" | "attribution">,
+) {
+  const separator = /[·•]|\s+[-–—]\s+/;
+  const [legacyName = "", ...legacyLocation] = review.attribution.split(separator);
+  const [explicitName = "", ...explicitLocation] = (review.reviewerName || "").split(separator);
+  const name = explicitName.trim() || legacyName.trim();
+  return {
+    name: name === "Verified Collector" ? "" : name,
+    location:
+      review.location?.trim() ||
+      explicitLocation.join(" · ").trim() ||
+      legacyLocation.join(" · ").trim(),
+  };
+}
 
 export const defaultCollectorReviews: CollectorReview[] = [
   {

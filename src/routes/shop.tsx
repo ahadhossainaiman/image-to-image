@@ -72,7 +72,7 @@ function Shop() {
       </div>
       {filtered.length > 0 ? (
         <div className="mt-8 grid gap-x-10 gap-y-20 md:grid-cols-2">
-          {filtered.map((artwork, index) => <ArtCard key={artwork.slug} a={artwork} priority={index < 2} className={index % 2 === 1 ? "md:mt-24" : ""} />)}
+          {filtered.map((artwork, index) => <ArtCard key={artwork.slug} a={artwork} priority={index < 2} />)}
         </div>
       ) : (
         <div className="glass-panel mt-8 py-24 text-center"><p className="font-display text-4xl">No works in this view</p><button className="btn-outline-art mt-7" onClick={() => { setCategory("all"); setAvailability("all"); }}>Clear filters</button></div>

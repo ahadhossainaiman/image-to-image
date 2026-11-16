@@ -140,7 +140,7 @@ function Index() {
                 </div>
               ))}
             </div>
-            <Link to="/about" className="mt-10 flex w-fit items-center gap-3 text-[10px] uppercase tracking-[.2em] text-primary hover:text-accent">Discover the atelier <ArrowRight className="h-4 w-4" /></Link>
+            <Link to="/atelier-story" className="mt-10 flex w-fit items-center gap-3 text-[10px] uppercase tracking-[.2em] text-primary hover:text-accent">Discover the atelier <ArrowRight className="h-4 w-4" /></Link>
           </div>
         </div>
       </section>
