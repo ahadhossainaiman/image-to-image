@@ -1,17 +1,18 @@
 import type { ReactNode } from "react";
 import { Link } from "@tanstack/react-router";
 import { ArrowRight, ShoppingBag, X } from "lucide-react";
-import { Dialog, DialogClose, DialogContent, DialogDescription, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { getArtwork } from "@/data/catalog";
+import { Sheet as Dialog, SheetClose as DialogClose, SheetContent as DialogContent, SheetDescription as DialogDescription, SheetTitle as DialogTitle, SheetTrigger as DialogTrigger } from "@/components/ui/sheet";
 import { removeFromCart, useCartDetails } from "@/lib/cart";
+import { setCartDrawerOpen, useCartDrawerOpen } from "@/lib/cart-drawer";
 
 export function CartDrawer({ children }: { children: ReactNode }) {
   const items = useCartDetails();
+  const open = useCartDrawerOpen();
 
   return (
-    <Dialog>
+    <Dialog open={open} onOpenChange={setCartDrawerOpen}>
       <DialogTrigger asChild>{children}</DialogTrigger>
-      <DialogContent className="glass-strong left-auto right-0 top-0 flex h-svh w-full max-w-md translate-x-0 translate-y-0 grid-rows-none flex-col gap-0 rounded-none p-0 text-foreground">
+      <DialogContent side="right" className="cart-sheet glass-strong flex h-svh w-full max-w-md flex-col gap-0 rounded-none p-0 text-foreground sm:max-w-md">
         <div className="flex items-start justify-between border-b border-border px-7 py-7">
           <div>
             <p className="eyebrow">Your private selection</p>

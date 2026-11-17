@@ -7,6 +7,7 @@ import { ArtCard } from "@/components/ArtCard";
 import { InquiryDialog } from "@/components/InquiryDialog";
 import { CertificateStatement } from "@/components/CertificateStatement";
 import { CollectorReviewsSection } from "@/components/CollectorReviewsSection";
+import { CollectionImage } from "@/components/CollectionImage";
 
 export const Route = createFileRoute("/")({
   loader: async () => {
@@ -86,10 +87,10 @@ function Index() {
         </div>
         <div className="mt-16 grid gap-x-7 gap-y-12 sm:grid-cols-2 lg:grid-cols-3">
           {categories.map((category, index) => category.published ? (
-            <Link key={category.slug} to="/collections/$slug" params={{ slug: category.slug }} className="group block">
+            <Link key={category.slug} to="/collections/$slug" params={{ slug: category.slug }} className="group block min-w-0">
               <div className="glass-panel art-frame aspect-[4/5] p-3 transition-transform duration-500 group-hover:-translate-y-2 group-hover:border-primary/60">
-                <div className="relative h-full overflow-hidden">
-                  {category.image && <img src={category.image} alt={category.name} loading="lazy" className="h-full w-full object-cover" />}
+                <div className="absolute inset-3 overflow-hidden bg-muted">
+                  {category.image && <CollectionImage key={category.image} src={category.image} alt={category.name} />}
                   <div className="absolute inset-0 bg-gradient-to-t from-background/85 via-transparent to-transparent" />
                   <span className="absolute left-5 top-5 text-[9px] tracking-[.25em] text-accent">0{index + 1}</span>
                   <div className="absolute inset-x-5 bottom-5 flex items-end justify-between gap-4">

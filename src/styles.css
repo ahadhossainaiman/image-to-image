@@ -271,6 +271,24 @@
 @utility animate-gentle-float { animation: gentle-float 7s ease-in-out infinite; }
 @utility animate-soft-pulse { animation: soft-pulse 4s ease-in-out infinite; }
 
+@keyframes cart-slide-in {
+  from { transform: translateX(100%); }
+  to { transform: translateX(0); }
+}
+
+@keyframes cart-slide-out {
+  from { transform: translateX(0); }
+  to { transform: translateX(100%); }
+}
+
+.cart-sheet[data-state="open"] {
+  animation: cart-slide-in 450ms cubic-bezier(.22, 1, .36, 1) both;
+}
+
+.cart-sheet[data-state="closed"] {
+  animation: cart-slide-out 320ms cubic-bezier(.4, 0, .6, 1) both;
+}
+
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
   *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }

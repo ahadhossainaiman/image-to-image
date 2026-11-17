@@ -2,6 +2,7 @@ import { useSyncExternalStore } from "react";
 import { wixClient, isWixConfigured, ensureVisitorTokens } from "@/lib/wix/client";
 import { formatWixImageUrl } from "@/lib/wix/types";
 import { getArtwork, type Artwork } from "@/data/catalog";
+import { setCartDrawerOpen } from "@/lib/cart-drawer";
 
 const WIX_STORES_APP_ID = "1380b703-ce81-ff05-f115-39571d94dfcd";
 const KEY = "thoa-cart";
@@ -245,6 +246,7 @@ export const addToCart = (artworkOrSlug: string | Artwork | { slug: string; titl
       })();
     }
   }
+  setCartDrawerOpen(true);
 };
 
 /**
