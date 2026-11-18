@@ -22,7 +22,7 @@ function Brand() {
       </span>
       <span>
         <span className="block font-display text-[1.55rem] leading-none tracking-[.025em]">Thy House Of Art</span>
-        <span className="mt-1 hidden text-[7px] uppercase tracking-[.32em] text-primary sm:block">Where angels & fairies live</span>
+        <span className="mt-1 hidden text-[7px] uppercase tracking-[.32em] text-primary sm:block">Discover the beauty within™</span>
       </span>
     </Link>
   );

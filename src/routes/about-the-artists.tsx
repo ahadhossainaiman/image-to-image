@@ -16,7 +16,7 @@ type Creator = {
 const creators: Creator[] = [
   {
     id: "alba",
-    name: "Alba",
+    name: "Alba Amóre",
     portrait: null,
     biography: [
       "Alba’s creative world begins with a fascination for the little things: the curve of a petal, the shimmer of a thread, and the quiet emotion a handmade object can hold. In this imagined introduction, nature and storytelling meet in a practice shaped by patience, curiosity, and a love of detail.",
@@ -27,10 +27,10 @@ const creators: Creator[] = [
   },
   {
     id: "zev-amore",
-    name: "Zev Amore",
+    name: "Zev Amóre",
     portrait: null,
     biography: [
-      "For Zev Amore, a creative idea is the beginning of a conversation between imagination, material, and feeling. This sample biography imagines an approach inspired by woodland shapes, unexpected textures, and the beauty of objects that reveal something new with every glance.",
+      "For Zev Amóre, a creative idea is the beginning of a conversation between imagination, material, and feeling. This sample biography imagines an approach inspired by woodland shapes, unexpected textures, and the beauty of objects that reveal something new with every glance.",
       "Within the world of Thy House Of Art, that spirit becomes an exploration of character and atmosphere. Every thoughtful detail contributes to a larger story: one that welcomes a little magic into everyday spaces and leaves room for a collector’s own imagination.",
     ],
     artwork: woodlandDetail,
@@ -44,10 +44,10 @@ export const Route = createFileRoute("/about-the-artists")({
       { title: "About The Artists — Thy House Of Art" },
       {
         name: "description",
-        content: "Meet ALBA and ZEV AMORE, the creators behind Thy House Of Art.",
+        content: "Meet Alba Amóre and Zev Amóre, the artists behind Thy House Of Art.",
       },
       { property: "og:title", content: "About The Artists — Thy House Of Art" },
-      { property: "og:description", content: "Discover the creators behind Thy House Of Art." },
+      { property: "og:description", content: "Discover the artists behind Thy House Of Art." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
     ],
@@ -76,7 +76,7 @@ function AboutTheArtists() {
         <div className="relative mt-9 grid items-end gap-9 lg:grid-cols-[1.4fr_.6fr]">
           <div>
             <p className="mb-4 text-[10px] uppercase tracking-[.3em] text-muted-foreground">
-              About us · The creators
+              About the artists
             </p>
             <h1 className="max-w-4xl text-6xl leading-[.94] sm:text-8xl lg:text-[7.5rem]">
               Behind the art,
@@ -85,12 +85,12 @@ function AboutTheArtists() {
             </h1>
           </div>
           <p className="max-w-sm border-l border-primary/35 pl-6 text-sm leading-7 text-muted-foreground lg:mb-2">
-            A closer introduction to Alba and Zev Amore, the people behind the world of Thy House Of
-            Art.
+            An intimate introduction to Alba and Zev Amóre, the artists behind the world of Thy
+            House Of Art.
           </p>
         </div>
         <nav
-          aria-label="Meet the creators"
+          aria-label="Meet the artists"
           className="relative mt-12 flex flex-wrap gap-x-10 gap-y-5 border-y border-border py-5 sm:mt-16"
         >
           {creators.map((creator, index) => (
@@ -108,8 +108,8 @@ function AboutTheArtists() {
               />
             </a>
           ))}
-          <span className="ml-auto hidden self-center text-[9px] uppercase tracking-[.24em] text-muted-foreground sm:block">
-            Two names. One house of art.
+          <span className="basis-full self-center text-[9px] uppercase tracking-[.24em] text-muted-foreground sm:ml-auto sm:basis-auto">
+            Two hearts as one created Thy House Of Art
           </span>
         </nav>
       </header>
@@ -122,46 +122,10 @@ function AboutTheArtists() {
             key={creator.id}
             className="scroll-mt-28 grid items-center gap-0 lg:grid-cols-2"
           >
-            <figure
-              className={`relative z-10 px-4 pb-0 pt-4 sm:px-8 sm:pt-8 lg:pb-8 ${index % 2 === 1 ? "lg:order-2" : ""}`}
-            >
-              <div
-                aria-hidden="true"
-                className="absolute inset-x-0 bottom-14 top-0 border border-primary/30 lg:bottom-0"
-              />
-              <div className="group relative isolate aspect-[4/5] overflow-hidden rounded-t-[45%] bg-forest">
-                <img
-                  src={creator.portrait || creator.artwork}
-                  alt={creator.portrait ? `Portrait of ${creator.name}` : creator.artworkAlt}
-                  loading="lazy"
-                  className={`h-full w-full object-cover transition-transform duration-1000 motion-safe:group-hover:scale-105 ${creator.portrait ? "" : "opacity-60"}`}
-                />
-                {!creator.portrait && (
-                  <>
-                    <div
-                      aria-hidden="true"
-                      className="absolute inset-0 bg-gradient-to-t from-forest via-forest/10 to-forest/10"
-                    />
-                    <div className="absolute inset-x-0 bottom-8 text-center">
-                      <span className="text-[9px] uppercase tracking-[.25em] text-ivory/80">
-                        Portrait forthcoming
-                      </span>
-                    </div>
-                  </>
-                )}
-              </div>
-              <figcaption className="relative flex items-center justify-between gap-4 py-5 text-[8px] uppercase tracking-[.2em] text-muted-foreground sm:text-[9px]">
-                <span>{creator.portrait ? "The creator" : "A detail from our world"}</span>
-                <span className="text-primary">Thy House Of Art / 0{index + 1}</span>
-              </figcaption>
-            </figure>
-
-            <div
-              className={`relative border border-primary/25 bg-secondary px-7 py-10 text-foreground shadow-[0_24px_70px_-36px_rgba(0,0,0,0.5)] sm:p-12 lg:py-16 ${index % 2 === 1 ? "lg:order-1 lg:-mr-5 lg:pr-16" : "lg:-ml-5 lg:pl-16"}`}
-            >
+            <div className="relative border border-primary/25 bg-secondary px-7 py-10 text-foreground shadow-[0_24px_70px_-36px_rgba(0,0,0,0.5)] sm:p-12 lg:-mr-5 lg:py-16 lg:pr-16">
               <div className="flex items-center justify-between border-b border-primary/20 pb-5">
                 <p className="text-[9px] uppercase tracking-[.25em] text-primary">
-                  Meet the creator
+                  Meet the artist
                 </p>
                 <span className="font-display text-3xl italic text-primary/65">0{index + 1}</span>
               </div>
@@ -203,6 +167,38 @@ function AboutTheArtists() {
                 {creator.name}
               </p>
             </div>
+
+            <figure className="relative z-10 px-4 pb-0 pt-4 sm:px-8 sm:pt-8 lg:pb-8">
+              <div
+                aria-hidden="true"
+                className="absolute inset-x-0 bottom-14 top-0 border border-primary/30 lg:bottom-0"
+              />
+              <div className="group relative isolate aspect-[4/5] overflow-hidden rounded-t-[45%] bg-forest">
+                <img
+                  src={creator.portrait || creator.artwork}
+                  alt={creator.portrait ? `Portrait of ${creator.name}` : creator.artworkAlt}
+                  loading="lazy"
+                  className={`h-full w-full object-cover transition-transform duration-1000 motion-safe:group-hover:scale-105 ${creator.portrait ? "" : "opacity-60"}`}
+                />
+                {!creator.portrait && (
+                  <>
+                    <div
+                      aria-hidden="true"
+                      className="absolute inset-0 bg-gradient-to-t from-forest via-forest/10 to-forest/10"
+                    />
+                    <div className="absolute inset-x-0 bottom-8 text-center">
+                      <span className="text-[9px] uppercase tracking-[.25em] text-ivory/80">
+                        Portrait forthcoming
+                      </span>
+                    </div>
+                  </>
+                )}
+              </div>
+              <figcaption className="relative flex items-center justify-between gap-4 py-5 text-[8px] uppercase tracking-[.2em] text-muted-foreground sm:text-[9px]">
+                <span>{creator.portrait ? "The creator" : "A detail from our world"}</span>
+                <span className="text-primary">Thy House Of Art / 0{index + 1}</span>
+              </figcaption>
+            </figure>
           </article>
         ))}
       </div>
