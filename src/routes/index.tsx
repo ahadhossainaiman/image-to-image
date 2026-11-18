@@ -1,5 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { ArrowDown, ArrowRight, ArrowUpRight, Feather, Gem, Leaf, Sparkles } from "lucide-react";
+import { useLayoutEffect, useRef } from "react";
 import forestHero from "@/assets/enchanted-forest-hero.jpg";
 import angelDetail from "@/assets/angel-2.jpg";
 import { getArtworks, getCategories, getCollectorReviews } from "@/lib/wix";
@@ -35,6 +36,38 @@ export const Route = createFileRoute("/")({
 
 function Index() {
   const { selectedWorks, categories, reviews } = Route.useLoaderData();
+  const taglineRowRef = useRef<HTMLDivElement>(null);
+  const taglineRef = useRef<HTMLParagraphElement>(null);
+
+  useLayoutEffect(() => {
+    const row = taglineRowRef.current;
+    const tagline = taglineRef.current;
+    if (!row || !tagline) return;
+
+    const fitTagline = () => {
+      const targetWidth = row.getBoundingClientRect().width;
+      const textWidth = tagline.getBoundingClientRect().width;
+      if (!targetWidth || !textWidth || Math.abs(targetWidth - textWidth) < 0.5) return;
+
+      const fontSize = Number.parseFloat(getComputedStyle(tagline).fontSize);
+      tagline.style.fontSize = `${fontSize * (targetWidth / textWidth)}px`;
+    };
+
+    fitTagline();
+    let frame = 0;
+    const observer = new ResizeObserver(() => {
+      cancelAnimationFrame(frame);
+      frame = requestAnimationFrame(fitTagline);
+    });
+    observer.observe(row);
+    observer.observe(tagline);
+
+    return () => {
+      observer.disconnect();
+      cancelAnimationFrame(frame);
+    };
+  }, []);
+
   return (
     <>
       <section className="relative flex min-h-[90svh] sm:min-h-[92svh] lg:min-h-[calc(100svh-5.5rem)] items-center overflow-hidden">
@@ -48,19 +81,25 @@ function Index() {
         />
         <div className="hero-vignette absolute inset-0" />
         <div className="relative mx-auto w-full max-w-[1600px] px-5 py-12 sm:px-8 sm:py-16 lg:py-20">
-          <div className="glass-panel mx-auto w-full max-w-xl p-6 sm:p-10 lg:mx-0 lg:ml-[2vw] xl:ml-[4vw] lg:max-w-xl xl:max-w-2xl lg:p-14">
-            <div className="botanical-rule w-fit eyebrow">An enchanted fine art atelier</div>
-            <h1 className="mt-6 text-[2.75rem] leading-[.9] tracking-[-.025em] sm:text-7xl md:text-8xl lg:text-[6.2rem] xl:text-[6.8rem]">
+          <div className="glass-panel mx-auto grid w-full max-w-xl grid-cols-[fit-content(100%)_minmax(0,1fr)] p-6 sm:p-10 lg:mx-0 lg:ml-[2vw] xl:ml-[4vw] lg:max-w-xl xl:max-w-2xl lg:p-14">
+            <div className="botanical-rule eyebrow max-sm:gap-2 max-sm:before:w-4 max-sm:after:w-4 max-[25rem]:tracking-[.12em] max-[22.5rem]:gap-1 max-[22.5rem]:tracking-[.08em] max-[22.5rem]:before:w-2 max-[22.5rem]:after:w-2">
+              An enchanted fine art atelier
+            </div>
+            <h1 className="col-span-2 mt-6 text-[2.75rem] leading-[.9] tracking-[-.025em] sm:text-7xl md:text-8xl lg:text-[6.2rem] xl:text-[6.8rem]">
               Thy House<br /><em className="font-normal text-accent">Of Art</em>
             </h1>
-            <p className="eyebrow mt-5 max-[360px]:-mr-4 sm:mt-6">DISCOVER THE BEAUTY WITHIN™</p>
-            <p className="mt-5 font-display text-xl italic leading-snug text-foreground sm:mt-7 sm:text-2xl lg:text-3xl">
+            <div ref={taglineRowRef} className="mt-5 [contain:inline-size] sm:mt-6">
+              <p ref={taglineRef} className="eyebrow w-max text-[.72rem] tracking-[.08em] whitespace-nowrap sm:text-sm">
+                DISCOVER THE BEAUTY WITHIN™
+              </p>
+            </div>
+            <p className="col-span-2 mt-4 font-display text-xl italic leading-snug text-foreground sm:mt-5 sm:text-2xl lg:text-3xl">
               Where Art, Magic & Artistry Converge
             </p>
-            <p className="mt-4 max-w-md text-xs leading-6 text-muted-foreground sm:mt-5 sm:text-sm sm:leading-7">
+            <p className="col-span-2 mt-3 max-w-md text-xs leading-6 text-muted-foreground sm:mt-4 sm:text-sm sm:leading-7">
               One-of-a-kind handmade creations, shaped slowly and finished with wonder. Each work is an invitation into a world that exists only once.
             </p>
-            <div className="mt-8 flex flex-col gap-3.5 sm:mt-9 sm:flex-row sm:items-center sm:gap-4">
+            <div className="col-span-2 mt-8 flex flex-col gap-3.5 sm:mt-9 sm:flex-row sm:items-center sm:gap-4">
               <Link to="/shop" className="btn-art justify-center">
                 Explore the gallery <ArrowRight className="h-4 w-4" strokeWidth={1.2} />
               </Link>
