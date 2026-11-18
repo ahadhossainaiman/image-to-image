@@ -1,7 +1,6 @@
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
 import tailwindcss from "@tailwindcss/vite";
-import tsconfigPaths from "vite-tsconfig-paths";
 import { TanStackRouterVite } from "@tanstack/router-plugin/vite";
 
 export default defineConfig({
@@ -9,8 +8,8 @@ export default defineConfig({
     TanStackRouterVite({ target: "react", autoCodeSplitting: true }),
     react(),
     tailwindcss(),
-    tsconfigPaths(),
   ],
+  resolve: { tsconfigPaths: true },
   server: {
     host: true,
     port: 8080,
@@ -19,5 +18,12 @@ export default defineConfig({
   build: {
     outDir: "dist",
     emptyOutDir: true,
+    rolldownOptions: {
+      output: {
+        codeSplitting: {
+          groups: [{ name: "wix", test: /node_modules[\\/]@wix[\\/]/ }],
+        },
+      },
+    },
   },
 });
