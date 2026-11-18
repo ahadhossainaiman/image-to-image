@@ -11,21 +11,24 @@ export function CollectorReviewsSection({ reviews }: CollectorReviewsSectionProp
   const [emblaRef, emblaApi] = useEmblaCarousel({
     loop: false,
     align: "start",
+    containScroll: false,
     slidesToScroll: 1,
+    breakpoints: {
+      "(min-width: 48rem)": { slidesToScroll: 2 },
+      "(min-width: 64rem)": { slidesToScroll: 3 },
+    },
   });
 
   const [selectedIndex, setSelectedIndex] = useState(0);
-  const [scrollSnaps, setScrollSnaps] = useState<number[]>([]);
   const [isPaused, setIsPaused] = useState(false);
   const [canScrollPrev, setCanScrollPrev] = useState(false);
-  const [canScrollNext, setCanScrollNext] = useState(false);
+  const [hasMultipleSets, setHasMultipleSets] = useState(false);
 
   const onSelect = useCallback(() => {
     if (!emblaApi) return;
     setSelectedIndex(emblaApi.selectedScrollSnap());
-    setScrollSnaps(emblaApi.scrollSnapList());
     setCanScrollPrev(emblaApi.canScrollPrev());
-    setCanScrollNext(emblaApi.canScrollNext());
+    setHasMultipleSets(emblaApi.scrollSnapList().length > 1);
   }, [emblaApi]);
 
   useEffect(() => {
@@ -39,34 +42,25 @@ export function CollectorReviewsSection({ reviews }: CollectorReviewsSectionProp
     };
   }, [emblaApi, onSelect]);
 
-  // Autoplay timer with pause-on-hover
-  useEffect(() => {
-    if (!emblaApi || isPaused) return;
-    const interval = setInterval(() => {
-      if (emblaApi.canScrollNext()) {
-        emblaApi.scrollNext();
-      } else {
-        // Animate back across the existing cards before starting again.
-        emblaApi.scrollTo(0);
-      }
-    }, 4500);
-    return () => clearInterval(interval);
-  }, [emblaApi, isPaused, selectedIndex]);
-
   const scrollPrev = useCallback(() => {
     if (emblaApi) emblaApi.scrollPrev();
   }, [emblaApi]);
 
   const scrollNext = useCallback(() => {
-    if (emblaApi) emblaApi.scrollNext();
+    if (!emblaApi) return;
+    if (emblaApi.canScrollNext()) {
+      emblaApi.scrollNext();
+    } else {
+      emblaApi.scrollTo(0);
+    }
   }, [emblaApi]);
 
-  const scrollTo = useCallback(
-    (index: number) => {
-      if (emblaApi) emblaApi.scrollTo(index);
-    },
-    [emblaApi],
-  );
+  // Restart the autoplay delay whenever a different set is selected.
+  useEffect(() => {
+    if (isPaused || !hasMultipleSets) return;
+    const interval = setInterval(scrollNext, 4500);
+    return () => clearInterval(interval);
+  }, [hasMultipleSets, isPaused, scrollNext, selectedIndex]);
 
   if (!reviews || reviews.length === 0) return null;
 
@@ -80,7 +74,7 @@ export function CollectorReviewsSection({ reviews }: CollectorReviewsSectionProp
       {/* Editorial Header */}
       <div className="flex flex-col gap-8 md:flex-row md:items-end md:justify-between border-b border-border/50 pb-10">
         <div className="max-w-2xl">
-          <div className="botanical-rule w-fit eyebrow">Collector reflections</div>
+          <div className="botanical-rule w-fit eyebrow">REFLECTIONS FROM OUR COLLECTORS</div>
           <h2
             id="collector-reflections-heading"
             className="mt-6 text-5xl leading-[1.02] sm:text-6xl lg:text-7xl"
@@ -213,7 +207,7 @@ export function CollectorReviewsSection({ reviews }: CollectorReviewsSectionProp
         <button
           type="button"
           onClick={scrollNext}
-          disabled={!canScrollNext}
+          disabled={!hasMultipleSets}
           aria-label="Next collector review"
           className="group relative flex h-8 w-8 sm:h-12 sm:w-12 items-center justify-center rounded-full border border-primary/35 bg-background/60 backdrop-blur-md transition-all duration-300 enabled:hover:border-primary enabled:hover:bg-primary enabled:hover:text-primary-foreground enabled:hover:scale-105 active:scale-95 disabled:opacity-30 disabled:cursor-not-allowed shadow-md"
         >
@@ -222,26 +216,6 @@ export function CollectorReviewsSection({ reviews }: CollectorReviewsSectionProp
             strokeWidth={1.3}
           />
         </button>
-      </div>
-
-      {/* Pagination Dot Indicators */}
-      <div className="mt-12 flex items-center justify-center gap-2">
-        {scrollSnaps.map((_, index) => {
-          const isActive = index === selectedIndex;
-          return (
-            <button
-              key={index}
-              type="button"
-              onClick={() => scrollTo(index)}
-              aria-label={`Go to slide ${index + 1}`}
-              className={`h-2 transition-all duration-500 rounded-full cursor-pointer ${
-                isActive
-                  ? "w-8 bg-primary shadow-[0_0_12px_var(--color-primary)]"
-                  : "w-2 bg-primary/25 hover:bg-primary/50"
-              }`}
-            />
-          );
-        })}
       </div>
 
       {/* Bottom Quiet Reassurance */}

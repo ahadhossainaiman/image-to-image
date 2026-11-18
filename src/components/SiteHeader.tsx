@@ -10,7 +10,7 @@ const nav = [
   { to: "/", label: "Home" },
   { to: "/shop", label: "Collections" },
   { to: "/atelier-story", label: "Atelier Story" },
-  { to: "/about-creators", label: "About Creators" },
+  { to: "/about-the-artists", label: "About The Artists" },
   { to: "/contact", label: "Bespoke Inquiry" },
 ] as const;
 
@@ -129,14 +129,22 @@ export function SiteFooter() {
         <div className="grid gap-12 lg:grid-cols-[1.1fr_.7fr_1.2fr] lg:gap-20">
           <div>
             <Brand />
-            <p className="mt-6 max-w-sm text-sm leading-7 text-muted-foreground">Singular handmade works for collectors who believe an object can hold a little magic.</p>
-            <div className="mt-7 flex items-center gap-3 text-[10px] uppercase tracking-[.17em] text-muted-foreground"><LockKeyhole className="h-3.5 w-3.5 text-primary" strokeWidth={1.2} /> Secure collector experience</div>
+            <p className="mt-6 max-w-sm text-sm leading-7 text-muted-foreground">Collectors of fine works see the world differently. They seek art that stirs their emotions and captivates their eyes. They find that anything made with love and intention is magical.</p>
+            <div className="mt-7 flex items-center gap-3 text-[10px] uppercase tracking-[.17em] text-muted-foreground"><LockKeyhole className="h-3.5 w-3.5 text-primary" strokeWidth={1.2} /> A SECURE COLLECTOR'S EXPERIENCE</div>
           </div>
           <div>
             <p className="eyebrow">The atelier</p>
             <div className="mt-6 flex flex-col items-start gap-4 text-sm text-muted-foreground">
               {nav.map((item) => <Link key={item.to} to={item.to} className="transition-colors hover:text-accent">{item.label}</Link>)}
-              <span className="flex items-center gap-2" aria-label="Instagram — link to be added"><Instagram className="h-4 w-4" strokeWidth={1.2} /> Instagram <span className="text-[8px] uppercase tracking-wider">(coming soon)</span></span>
+              <a
+                href="https://www.instagram.com/thyhouseofart"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-2 transition-colors hover:text-accent"
+              >
+                <Instagram className="h-4 w-4" strokeWidth={1.2} aria-hidden="true" />
+                Instagram
+              </a>
             </div>
           </div>
           <div>

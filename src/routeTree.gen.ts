@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as AboutCreatorsRouteImport } from './routes/about-creators'
+import { Route as AboutTheArtistsRouteImport } from './routes/about-the-artists'
 import { Route as AtelierStoryRouteImport } from './routes/atelier-story'
 import { Route as CartRouteImport } from './routes/cart'
 import { Route as ContactRouteImport } from './routes/contact'
@@ -32,6 +33,11 @@ const AboutRoute = AboutRouteImport.update({
 const AboutCreatorsRoute = AboutCreatorsRouteImport.update({
   id: '/about-creators',
   path: '/about-creators',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AboutTheArtistsRoute = AboutTheArtistsRouteImport.update({
+  id: '/about-the-artists',
+  path: '/about-the-artists',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AtelierStoryRoute = AtelierStoryRouteImport.update({
@@ -69,6 +75,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/about-creators': typeof AboutCreatorsRoute
+  '/about-the-artists': typeof AboutTheArtistsRoute
   '/atelier-story': typeof AtelierStoryRoute
   '/cart': typeof CartRoute
   '/contact': typeof ContactRoute
@@ -80,6 +87,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/about-creators': typeof AboutCreatorsRoute
+  '/about-the-artists': typeof AboutTheArtistsRoute
   '/atelier-story': typeof AtelierStoryRoute
   '/cart': typeof CartRoute
   '/contact': typeof ContactRoute
@@ -92,6 +100,7 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/about-creators': typeof AboutCreatorsRoute
+  '/about-the-artists': typeof AboutTheArtistsRoute
   '/atelier-story': typeof AtelierStoryRoute
   '/cart': typeof CartRoute
   '/contact': typeof ContactRoute
@@ -105,6 +114,7 @@ export interface FileRouteTypes {
     | '/'
     | '/about'
     | '/about-creators'
+    | '/about-the-artists'
     | '/atelier-story'
     | '/cart'
     | '/contact'
@@ -116,6 +126,7 @@ export interface FileRouteTypes {
     | '/'
     | '/about'
     | '/about-creators'
+    | '/about-the-artists'
     | '/atelier-story'
     | '/cart'
     | '/contact'
@@ -127,6 +138,7 @@ export interface FileRouteTypes {
     | '/'
     | '/about'
     | '/about-creators'
+    | '/about-the-artists'
     | '/atelier-story'
     | '/cart'
     | '/contact'
@@ -139,6 +151,7 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AboutRoute: typeof AboutRoute
   AboutCreatorsRoute: typeof AboutCreatorsRoute
+  AboutTheArtistsRoute: typeof AboutTheArtistsRoute
   AtelierStoryRoute: typeof AtelierStoryRoute
   CartRoute: typeof CartRoute
   ContactRoute: typeof ContactRoute
@@ -168,6 +181,13 @@ declare module '@tanstack/react-router' {
       path: '/about-creators'
       fullPath: '/about-creators'
       preLoaderRoute: typeof AboutCreatorsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/about-the-artists': {
+      id: '/about-the-artists'
+      path: '/about-the-artists'
+      fullPath: '/about-the-artists'
+      preLoaderRoute: typeof AboutTheArtistsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/atelier-story': {
@@ -219,6 +239,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AboutRoute: AboutRoute,
   AboutCreatorsRoute: AboutCreatorsRoute,
+  AboutTheArtistsRoute: AboutTheArtistsRoute,
   AtelierStoryRoute: AtelierStoryRoute,
   CartRoute: CartRoute,
   ContactRoute: ContactRoute,

@@ -53,7 +53,7 @@ function Index() {
             <h1 className="mt-6 text-[2.75rem] leading-[.9] tracking-[-.025em] sm:text-7xl md:text-8xl lg:text-[6.2rem] xl:text-[6.8rem]">
               Thy House<br /><em className="font-normal text-accent">Of Art</em>
             </h1>
-            <p className="eyebrow mt-5 sm:mt-6">DISCOVER THE BEAUTY WITHIN</p>
+            <p className="eyebrow mt-5 max-[360px]:-mr-4 sm:mt-6">DISCOVER THE BEAUTY WITHIN™</p>
             <p className="mt-5 font-display text-xl italic leading-snug text-foreground sm:mt-7 sm:text-2xl lg:text-3xl">
               Where Art, Magic & Artistry Converge
             </p>
@@ -164,7 +164,7 @@ function Index() {
           <Sparkles className="mx-auto h-6 w-6 text-primary" strokeWidth={.9} />
           <p className="eyebrow mt-7">A work of your own</p>
           <h2 className="mx-auto mt-5 max-w-3xl text-5xl leading-[1.02] sm:text-6xl">Some stories are waiting<br /><em className="text-accent">to be made.</em></h2>
-          <p className="mx-auto mt-6 max-w-lg text-sm leading-7 text-muted-foreground">Commission a singular artwork for your home, a meaningful occasion, or a private collection.</p>
+          <p className="mx-auto mt-6 max-w-lg text-sm leading-7 text-muted-foreground">Commission a bespoke work exclusively designed and created for you, a meaningful person or occasion, or for your private collection. We will contact you and set up a 15-minute, no-obligation discussion about your vision.</p>
           <InquiryDialog><button className="btn-art mt-9">Begin a bespoke inquiry <ArrowRight className="h-4 w-4" /></button></InquiryDialog>
         </div>
       </section>
