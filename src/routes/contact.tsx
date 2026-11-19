@@ -57,7 +57,7 @@ export function Contact() {
         <p className="mx-auto mt-7 max-w-xl text-sm leading-7 text-muted-foreground">Tell us about the artwork that caught your eye, your space, or the story you would like us to bring to life.</p>
       </header>
       <div className="mt-16 grid gap-10 lg:grid-cols-[.72fr_1.28fr]">
-        <aside className="glass-panel h-fit p-8 sm:p-10">
+        <aside className="glass-panel self-start p-8 sm:p-10">
           <Sparkles className="h-5 w-5 text-primary" strokeWidth={1} />
           <h2 className="mt-6 text-4xl">A personal beginning</h2>
           <p className="mt-5 text-sm leading-7 text-muted-foreground">Every bespoke work starts with listening. Your ideas, preferred materials, scale and sense of wonder guide the conversation.</p>
@@ -74,7 +74,7 @@ export function Contact() {
             <label className="text-[10px] uppercase tracking-[.16em] text-muted-foreground">Your name <span aria-hidden="true" className="text-accent">*</span><input name="name" required autoComplete="name" className="input-art mt-3 normal-case tracking-normal" placeholder="How shall we address you?" /></label>
             <label className="text-[10px] uppercase tracking-[.16em] text-muted-foreground">Email address <span aria-hidden="true" className="text-accent">*</span><input name="email" required type="email" autoComplete="email" className="input-art mt-3 normal-case tracking-normal" placeholder="you@example.com" /></label>
             <label className="text-[10px] uppercase tracking-[.16em] text-muted-foreground sm:col-span-2">Phone Number<input name="phone" type="tel" autoComplete="tel" className="input-art mt-3 normal-case tracking-normal" placeholder="Enter your phone number" /></label>
-            <label className="text-[10px] uppercase tracking-[.16em] text-muted-foreground sm:col-span-2">Tell us your story <span aria-hidden="true" className="text-accent">*</span><textarea name="vision" required maxLength={1000} rows={1} className="input-art mt-3 h-[50px] min-h-[50px] resize-y normal-case leading-normal tracking-normal" placeholder="The feeling, scale, materials or occasion you have in mind…" /></label>
+            <label className="text-[10px] uppercase tracking-[.16em] text-muted-foreground sm:col-span-2">Tell us your story <span aria-hidden="true" className="text-accent">*</span><textarea name="vision" required maxLength={1000} rows={6} className="input-art mt-3 h-44 min-h-44 resize-y normal-case leading-normal tracking-normal" placeholder="The feeling, scale, materials or occasion you have in mind…" /></label>
           </div>
           <Button type="submit" className="btn-art mt-8 h-auto w-full rounded-none">Save inquiry draft <Save className="h-4 w-4" strokeWidth={1.2} /></Button>
           <p className="mt-4 text-center text-[10px] leading-5 text-muted-foreground">This saves a draft on your device only. Direct atelier delivery has not been connected, so no message is sent.</p>

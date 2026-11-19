@@ -125,11 +125,11 @@ export function SiteFooter() {
   return (
     <footer className="relative mt-24 overflow-hidden border-t border-border bg-forest">
       <div className="pointer-events-none absolute -right-32 -top-32 h-96 w-96 rounded-full bg-primary/5 blur-3xl" />
-      <div className="mx-auto max-w-[1500px] px-6 py-16 sm:px-10 lg:py-20">
+      <div className="mx-auto max-w-[1600px] px-6 py-16 sm:px-10 lg:px-8 lg:py-20">
         <div className="grid gap-12 lg:grid-cols-[1.1fr_.7fr_1.2fr] lg:gap-20">
           <div>
             <Brand />
-            <p className="mt-6 max-w-sm text-sm leading-7 text-muted-foreground">Collectors of fine works see the world differently. They seek art that stirs their emotions and captivates their eyes. They find that anything made with love and intention is magical.</p>
+            <p className="mt-6 max-w-sm text-sm leading-7 text-muted-foreground">Collectors find great value in art that moves them. They see the world differently and seek art that stirs their emotions and captivates their souls. With that, they discover that everything created with love, talent and intention holds a little magic.</p>
             <div className="mt-7 flex items-center gap-3 text-[10px] uppercase tracking-[.17em] text-muted-foreground"><LockKeyhole className="h-3.5 w-3.5 text-primary" strokeWidth={1.2} /> A SECURE COLLECTOR'S EXPERIENCE</div>
           </div>
           <div>

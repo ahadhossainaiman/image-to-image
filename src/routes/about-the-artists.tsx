@@ -1,40 +1,91 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { ArrowDown, ArrowUpRight, Flower2, Sparkles } from "lucide-react";
-import angelDetail from "@/assets/angel-2.jpg";
+import type { ReactNode } from "react";
 import woodlandDetail from "@/assets/mushroom-2.jpg";
 
 type Creator = {
   id: string;
   name: string;
-  portrait: string | null;
-  biography: string[];
-  artwork: string;
-  artworkAlt: string;
+  biography: ReactNode;
+  sampleBiography?: boolean;
+  closingLine?: string;
+  image: string;
+  imageAlt: string;
+  portrait?: boolean;
 };
 
-// Replace the sample biographies and artwork images with approved creator content.
 const creators: Creator[] = [
   {
     id: "alba",
     name: "Alba Amóre",
-    portrait: null,
-    biography: [
-      "Alba’s creative world begins with a fascination for the little things: the curve of a petal, the shimmer of a thread, and the quiet emotion a handmade object can hold. In this imagined introduction, nature and storytelling meet in a practice shaped by patience, curiosity, and a love of detail.",
-      "Each creation is an invitation to pause and look a little closer. Through soft textures, delicate embellishments, and a sense of wonder, her work explores the connection between the things we treasure and the stories we carry with us.",
-    ],
-    artwork: angelDetail,
-    artworkAlt: "Gold and ivory embroidery from the atelier",
+    biography: (
+      <>
+        <p>
+          Alba has always cherished the art of bringing people together. Whether celebrating holidays,
+          birthdays, school achievements, or life's special milestones, she delights in creating
+          memorable experiences filled with love, thoughtful details, handmade decorations, and
+          beautifully curated tables. She affectionately calls these occasions her{" "}
+          <em>Celebrations of Love &amp; Life</em>, where every glass is filled with Martinelli's
+          sparkling apple cider and every moment becomes a cherished memory.
+        </p>
+        <p>
+          Birthdays were especially magical. When the children were young, Alba and her husband, Zev,
+          would stay up until the early morning hours transforming their home into elaborate, fully
+          themed wonderlands. The children's astonishment and excitement the following morning made
+          every late night worthwhile. For Alba, there was something extraordinary about creating
+          moments of surprise, wonder, and lasting happiness.
+        </p>
+        <p>
+          As the children grew and began making homes of their own, Alba found new ways to express
+          her creativity. She began designing and handcrafting personal treasures for family and
+          friends, including heirloom dolls, fairies, needle-felted creations, sculpted characters,
+          jewelry, and meaningful gifts for life's milestones. Before long, others began requesting
+          her creations, lovingly treasuring them as keepsakes and heirlooms. Her home became
+          affectionately known as the house of art, inspiring the name <strong>Thy House of Art</strong>.
+        </p>
+        <p>
+          A woman of many talents and an ever-evolving imagination, Alba is a true Renaissance
+          spirit, continually exploring new artistic disciplines and discovering fresh ways to bring
+          her visions to life.
+        </p>
+        <p>
+          With an artist's eye, a golden heart, and enlightened hands, she draws inspiration from
+          nature's colors, the delicate beauty of flowers, the textures of the earth, and the
+          countless wonders of everything created by our Maker above.
+        </p>
+        <p>
+          Every creation reflects her love of beauty, imagination, and the joy of making something
+          meaningful.
+        </p>
+        <p>Her guiding inspiration remains:</p>
+      </>
+    ),
+    closingLine: "Discover The Beauty Within™",
+    image: "/ALBA-IN-THE-MIRROR.png",
+    imageAlt: "Alba Amóre beside her reflection in a textured mirror",
+    portrait: true,
   },
   {
     id: "zev-amore",
     name: "Zev Amóre",
-    portrait: null,
-    biography: [
-      "For Zev Amóre, a creative idea is the beginning of a conversation between imagination, material, and feeling. This sample biography imagines an approach inspired by woodland shapes, unexpected textures, and the beauty of objects that reveal something new with every glance.",
-      "Within the world of Thy House Of Art, that spirit becomes an exploration of character and atmosphere. Every thoughtful detail contributes to a larger story: one that welcomes a little magic into everyday spaces and leaves room for a collector’s own imagination.",
-    ],
-    artwork: woodlandDetail,
-    artworkAlt: "Botanical embroidery on a woodland sculpture",
+    biography: (
+      <>
+        <p>
+          For Zev Amóre, a creative idea is the beginning of a conversation between imagination,
+          material, and feeling. This sample biography imagines an approach inspired by woodland
+          shapes, unexpected textures, and the beauty of objects that reveal something new with every
+          glance.
+        </p>
+        <p>
+          Within the world of Thy House Of Art, that spirit becomes an exploration of character and
+          atmosphere. Every thoughtful detail contributes to a larger story: one that welcomes a
+          little magic into everyday spaces and leaves room for a collector’s own imagination.
+        </p>
+      </>
+    ),
+    sampleBiography: true,
+    image: woodlandDetail,
+    imageAlt: "Botanical embroidery on a woodland sculpture",
   },
 ];
 
@@ -57,8 +108,8 @@ export const Route = createFileRoute("/about-the-artists")({
 
 function AboutTheArtists() {
   return (
-    <div className="overflow-hidden">
-      <header className="relative mx-auto max-w-[1400px] px-5 pb-14 pt-16 sm:px-10 lg:pb-20 lg:pt-24">
+    <div className="overflow-x-clip">
+      <header className="relative mx-auto max-w-[1600px] px-5 pb-14 pt-16 sm:px-10 lg:px-8 lg:pb-20 lg:pt-24">
         <div
           aria-hidden="true"
           className="pointer-events-none absolute -right-28 top-6 h-96 w-96 rounded-full border border-primary/10 sm:right-0"
@@ -114,15 +165,16 @@ function AboutTheArtists() {
         </nav>
       </header>
 
-      <div className="mx-auto max-w-[1400px] space-y-20 px-5 sm:space-y-28 sm:px-10 lg:space-y-36">
+      <div className="@container mx-auto max-w-[1600px] space-y-20 px-5 sm:space-y-28 sm:px-10 lg:space-y-36 lg:px-8">
         {creators.map((creator, index) => (
           <article
             id={creator.id}
             aria-labelledby={`${creator.id}-name`}
             key={creator.id}
-            className="scroll-mt-28 grid items-center gap-0 lg:grid-cols-2"
+            className="scroll-mt-28 grid gap-0 lg:grid-cols-[minmax(0,1fr)_var(--portrait-width)] lg:[--portrait-width:56.5cqw] lg:[--portrait-height:min(calc((var(--portrait-width)_-_4rem)*966/1287),max(20rem,calc(100svh_-_15.5rem)))]"
           >
-            <div className="relative border border-primary/25 bg-secondary px-7 py-10 text-foreground shadow-[0_24px_70px_-36px_rgba(0,0,0,0.5)] sm:p-12 lg:-mr-5 lg:py-16 lg:pr-16">
+            {/* The extra height accounts for the figure frame, caption, and sticky scroll travel. */}
+            <div className="relative border border-primary/25 bg-secondary px-7 py-10 text-foreground shadow-[0_24px_70px_-36px_rgba(0,0,0,0.5)] sm:p-12 lg:-mr-3 lg:min-h-[calc(var(--portrait-height)_+_11rem)] lg:py-16 lg:pr-16">
               <div className="flex items-center justify-between border-b border-primary/20 pb-5">
                 <p className="text-[9px] uppercase tracking-[.25em] text-primary">
                   Meet the artist
@@ -131,7 +183,7 @@ function AboutTheArtists() {
               </div>
               <h2
                 id={`${creator.id}-name`}
-                className="mt-8 text-6xl leading-[.95] sm:text-7xl lg:text-8xl"
+                className="mt-8 text-6xl leading-[.95] sm:text-7xl xl:text-8xl"
               >
                 {creator.name}
               </h2>
@@ -139,59 +191,43 @@ function AboutTheArtists() {
                 <span className="h-px w-12 bg-primary/40" />
                 <Sparkles className="h-4 w-4 text-primary" strokeWidth={1} />
               </div>
-              {creator.biography.length > 0 ? (
-                <div className="space-y-5 text-sm leading-8 text-foreground/80">
-                  <p className="text-[9px] uppercase tracking-[.2em] text-primary/80">
-                    Sample biography
-                  </p>
-                  {creator.biography.map((paragraph) => (
-                    <p key={paragraph}>{paragraph}</p>
-                  ))}
-                </div>
-              ) : (
-                <div className="max-w-sm">
-                  <p className="font-display text-3xl italic leading-snug">
-                    A personal story,
-                    <br />
-                    in their own words.
-                  </p>
-                  <p className="mt-6 text-xs leading-7 text-muted-foreground">
-                    Biography forthcoming.
-                  </p>
-                </div>
-              )}
+              <div className="space-y-5 text-sm leading-8 text-foreground/80">
+                <p className="text-[9px] uppercase tracking-[.2em] text-primary/80">
+                  {creator.sampleBiography ? "Sample biography" : "Biography"}
+                </p>
+                {creator.biography}
+              </div>
               <p
-                aria-hidden="true"
+                aria-hidden={!creator.closingLine}
                 className="mt-10 border-t border-primary/20 pt-5 font-display text-3xl italic text-accent/80"
               >
-                {creator.name}
+                {creator.closingLine ?? creator.name}
               </p>
+              {/* Insert Alba's signature below her closing line when Zev provides it. */}
             </div>
 
-            <figure className="relative z-10 px-4 pb-0 pt-4 sm:px-8 sm:pt-8 lg:pb-8">
+            <figure className="relative z-10 px-4 pb-0 pt-4 sm:px-8 sm:pt-8 lg:sticky lg:top-28 lg:self-start lg:pb-8">
               <div
                 aria-hidden="true"
                 className="absolute inset-x-0 bottom-14 top-0 border border-primary/30 lg:bottom-0"
               />
-              <div className="group relative isolate aspect-[4/5] overflow-hidden rounded-t-[45%] bg-forest">
+              <div className="relative isolate aspect-[1287/966] w-full overflow-hidden rounded-t-[45%] bg-forest lg:max-h-[var(--portrait-height)]">
                 <img
-                  src={creator.portrait || creator.artwork}
-                  alt={creator.portrait ? `Portrait of ${creator.name}` : creator.artworkAlt}
+                  src={creator.image}
+                  alt={creator.imageAlt}
                   loading="lazy"
-                  className={`h-full w-full object-cover transition-transform duration-1000 motion-safe:group-hover:scale-105 ${creator.portrait ? "" : "opacity-60"}`}
+                  className={`h-full w-full opacity-60 ${creator.portrait ? "object-contain" : "object-cover"}`}
+                />
+                <div
+                  aria-hidden="true"
+                  className="absolute inset-0 bg-gradient-to-t from-forest via-forest/10 to-forest/10"
                 />
                 {!creator.portrait && (
-                  <>
-                    <div
-                      aria-hidden="true"
-                      className="absolute inset-0 bg-gradient-to-t from-forest via-forest/10 to-forest/10"
-                    />
-                    <div className="absolute inset-x-0 bottom-8 text-center">
-                      <span className="text-[9px] uppercase tracking-[.25em] text-ivory/80">
-                        Portrait forthcoming
-                      </span>
-                    </div>
-                  </>
+                  <div className="absolute inset-x-0 bottom-8 text-center">
+                    <span className="text-[9px] uppercase tracking-[.25em] text-ivory/80">
+                      Portrait forthcoming
+                    </span>
+                  </div>
                 )}
               </div>
               <figcaption className="relative flex items-center justify-between gap-4 py-5 text-[8px] uppercase tracking-[.2em] text-muted-foreground sm:text-[9px]">
