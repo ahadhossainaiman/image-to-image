@@ -215,20 +215,34 @@ export function CollectorReviewsSection({ reviews }: CollectorReviewsSectionProp
                     </div>
 
                     {/* Collector details from CMS, above the verification rule. */}
-                    <footer className="relative z-10 mt-4 md:mt-8">
+                    <footer className="@container relative z-10 mt-4 md:mt-8">
                       {(collector.name || collector.location) && (
-                        <div className="mb-3 md:mb-5">
+                        <p className="mb-3 flex items-baseline gap-0.5 md:mb-5 @min-[13rem]:gap-1">
                           {collector.name && (
-                            <p className="font-display text-lg leading-snug text-foreground transition-colors duration-300 group-hover:text-accent">
+                            <span
+                              className="min-w-0 shrink-[0.5] truncate font-display text-[clamp(0.875rem,7cqi,1.125rem)] leading-snug text-foreground transition-colors duration-300 group-hover:text-accent"
+                              title={collector.name}
+                            >
                               {collector.name}
-                            </p>
+                            </span>
+                          )}
+                          {collector.name && collector.location && (
+                            <span
+                              aria-hidden="true"
+                              className="shrink-0 text-xs text-muted-foreground"
+                            >
+                              ·
+                            </span>
                           )}
                           {collector.location && (
-                            <p className="mt-1 text-xs leading-relaxed text-muted-foreground">
+                            <span
+                              className="min-w-0 truncate text-[clamp(0.625rem,5.2cqi,0.75rem)] leading-relaxed text-muted-foreground"
+                              title={collector.location}
+                            >
                               {collector.location}
-                            </p>
+                            </span>
                           )}
-                        </div>
+                        </p>
                       )}
                       <div className="border-t border-border/40 pt-3 md:pt-5">
                         <p className="text-[9px] uppercase tracking-[.22em] text-muted-foreground transition-colors duration-300 group-hover:text-primary">
