@@ -134,7 +134,7 @@ export function SiteFooter() {
           </div>
           <div>
             <p className="eyebrow">The atelier</p>
-            <div className="mt-2 grid grid-cols-2 items-start gap-x-3 gap-y-1 md:mt-6 md:flex md:flex-col md:gap-4 text-sm text-muted-foreground">
+            <div className="mt-4 flex flex-col items-start gap-1 text-sm text-muted-foreground md:mt-6 md:gap-4">
               {nav.map((item) => <Link key={item.to} to={item.to} className="flex min-h-8 items-center transition-colors hover:text-accent md:min-h-0">{item.label}</Link>)}
               <a
                 href="https://www.instagram.com/thyhouseofart"
