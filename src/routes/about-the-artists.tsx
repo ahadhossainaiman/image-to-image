@@ -1,7 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { ArrowDown, ArrowUpRight, Flower2, Sparkles } from "lucide-react";
 import type { ReactNode } from "react";
-import woodlandDetail from "@/assets/mushroom-2.jpg";
 
 type Creator = {
   id: string;
@@ -11,7 +10,7 @@ type Creator = {
   closingLine?: string;
   image: string;
   imageAlt: string;
-  portrait?: boolean;
+  imageCaption: string;
 };
 
 const creators: Creator[] = [
@@ -63,7 +62,7 @@ const creators: Creator[] = [
     closingLine: "Discover The Beauty Within™",
     image: "/ALBA-IN-THE-MIRROR.png",
     imageAlt: "Alba Amóre beside her reflection in a textured mirror",
-    portrait: true,
+    imageCaption: "The creator",
   },
   {
     id: "zev-amore",
@@ -84,8 +83,9 @@ const creators: Creator[] = [
       </>
     ),
     sampleBiography: true,
-    image: woodlandDetail,
-    imageAlt: "Botanical embroidery on a woodland sculpture",
+    image: "/Zev%20_%20Alba.jpg",
+    imageAlt: "Zev and Alba Amóre smiling together",
+    imageCaption: "Zev & Alba Amóre",
   },
 ];
 
@@ -109,7 +109,7 @@ export const Route = createFileRoute("/about-the-artists")({
 function AboutTheArtists() {
   return (
     <div className="overflow-x-clip">
-      <header className="relative mx-auto max-w-[1600px] px-5 pb-14 pt-16 sm:px-10 lg:px-8 lg:pb-20 lg:pt-24">
+      <header className="relative mx-auto max-w-[1600px] px-4 pt-8 pb-5 sm:px-10 md:pt-16 md:pb-14 lg:px-8 lg:pb-20 lg:pt-24">
         <div
           aria-hidden="true"
           className="pointer-events-none absolute -right-28 top-6 h-96 w-96 rounded-full border border-primary/10 sm:right-0"
@@ -124,31 +124,31 @@ function AboutTheArtists() {
           <span className="h-px w-10 bg-primary/50 max-[360px]:w-7" />
           Discover the beauty within™
         </p>
-        <div className="relative mt-9 grid items-end gap-9 lg:grid-cols-[1.4fr_.6fr]">
+        <div className="relative mt-4 grid items-end gap-3 md:mt-9 md:gap-9 lg:grid-cols-[1.4fr_.6fr]">
           <div>
-            <p className="mb-4 text-[10px] uppercase tracking-[.3em] text-muted-foreground">
+            <p className="mb-2 text-[10px] md:mb-4 uppercase tracking-[.3em] text-muted-foreground">
               About the artists
             </p>
-            <h1 className="max-w-4xl text-6xl leading-[.94] sm:text-8xl lg:text-[7.5rem]">
+            <h1 className="max-w-4xl text-[clamp(2.5rem,9vw,3.75rem)] leading-[.94] sm:text-8xl lg:text-[7.5rem]">
               Behind the art,
               <br />
               <em className="text-accent">a human story.</em>
             </h1>
           </div>
-          <p className="max-w-sm border-l border-primary/35 pl-6 text-sm leading-7 text-muted-foreground lg:mb-2">
+          <p className="max-w-sm border-l border-primary/35 pl-3 text-sm leading-relaxed md:pl-6 md:leading-7 text-muted-foreground lg:mb-2">
             An intimate introduction to Alba and Zev Amóre, the artists behind the world of Thy
             House Of Art.
           </p>
         </div>
         <nav
           aria-label="Meet the artists"
-          className="relative mt-12 flex flex-wrap gap-x-10 gap-y-5 border-y border-border py-5 sm:mt-16"
+          className="relative mt-5 flex flex-wrap gap-x-5 gap-y-2 border-y border-border py-3 md:mt-16 md:gap-x-10 md:gap-y-5 md:py-5"
         >
           {creators.map((creator, index) => (
             <a
               key={creator.id}
               href={`#${creator.id}`}
-              className="group flex items-center gap-4 text-xs text-foreground transition-colors hover:text-accent"
+              className="group flex min-h-8 items-center gap-2 text-xs md:min-h-0 md:gap-4 text-foreground transition-colors hover:text-accent"
             >
               <span className="text-[9px] tracking-widest text-primary">0{index + 1}</span>
               <span className="tracking-[.16em] uppercase">{creator.name}</span>
@@ -159,23 +159,23 @@ function AboutTheArtists() {
               />
             </a>
           ))}
-          <span className="basis-full self-center text-[9px] uppercase tracking-[.24em] text-muted-foreground sm:ml-auto sm:basis-auto">
+          <span className="basis-full self-center text-[9px] uppercase tracking-[.24em] text-muted-foreground md:ml-auto md:basis-auto">
             Two hearts as one created Thy House Of Art
           </span>
         </nav>
       </header>
 
-      <div className="@container mx-auto max-w-[1600px] space-y-20 px-5 sm:space-y-28 sm:px-10 lg:space-y-36 lg:px-8">
+      <div className="@container mx-auto max-w-[1600px] space-y-6 px-4 sm:px-10 md:space-y-28 lg:space-y-36 lg:px-8">
         {creators.map((creator, index) => (
           <article
             id={creator.id}
             aria-labelledby={`${creator.id}-name`}
             key={creator.id}
-            className="scroll-mt-28 grid gap-0 lg:grid-cols-[minmax(0,1fr)_var(--portrait-width)] lg:[--portrait-width:56.5cqw] lg:[--portrait-height:min(calc((var(--portrait-width)_-_4rem)*966/1287),max(20rem,calc(100svh_-_15.5rem)))]"
+            className="grid scroll-mt-20 gap-0 sm:scroll-mt-28 lg:grid-cols-[minmax(0,1fr)_var(--portrait-width)] lg:[--portrait-width:56.5cqw] lg:[--portrait-height:min(calc((var(--portrait-width)_-_4rem)*966/1287),max(20rem,calc(100svh_-_15.5rem)))]"
           >
             {/* The extra height accounts for the figure frame, caption, and sticky scroll travel. */}
-            <div className="relative border border-primary/25 bg-secondary px-7 py-10 text-foreground shadow-[0_24px_70px_-36px_rgba(0,0,0,0.5)] sm:p-12 lg:-mr-3 lg:min-h-[calc(var(--portrait-height)_+_11rem)] lg:py-16 lg:pr-16">
-              <div className="flex items-center justify-between border-b border-primary/20 pb-5">
+            <div className="relative border border-primary/25 bg-secondary px-4 py-5 text-foreground shadow-[0_24px_70px_-36px_rgba(0,0,0,0.5)] sm:p-7 md:p-12 lg:-mr-3 lg:min-h-[calc(var(--portrait-height)_+_11rem)] lg:py-16 lg:pr-16">
+              <div className="flex items-center justify-between border-b border-primary/20 pb-3 md:pb-5">
                 <p className="text-[9px] uppercase tracking-[.25em] text-primary">
                   Meet the artist
                 </p>
@@ -183,15 +183,15 @@ function AboutTheArtists() {
               </div>
               <h2
                 id={`${creator.id}-name`}
-                className="mt-8 text-6xl leading-[.95] sm:text-7xl xl:text-8xl"
+                className="mt-4 text-4xl md:mt-8 leading-[.95] sm:text-7xl xl:text-8xl"
               >
                 {creator.name}
               </h2>
-              <div aria-hidden="true" className="my-7 flex items-center gap-3">
+              <div aria-hidden="true" className="my-3 flex items-center md:my-7 gap-3">
                 <span className="h-px w-12 bg-primary/40" />
                 <Sparkles className="h-4 w-4 text-primary" strokeWidth={1} />
               </div>
-              <div className="space-y-5 text-sm leading-8 text-foreground/80">
+              <div className="space-y-3 text-sm leading-relaxed md:space-y-5 md:leading-8 text-foreground/80">
                 <p className="text-[9px] uppercase tracking-[.2em] text-primary/80">
                   {creator.sampleBiography ? "Sample biography" : "Biography"}
                 </p>
@@ -199,39 +199,32 @@ function AboutTheArtists() {
               </div>
               <p
                 aria-hidden={!creator.closingLine}
-                className="mt-10 border-t border-primary/20 pt-5 font-display text-3xl italic text-accent/80"
+                className="mt-5 border-t border-primary/20 pt-3 font-display text-2xl md:mt-10 md:pt-5 md:text-3xl italic text-accent/80"
               >
                 {creator.closingLine ?? creator.name}
               </p>
               {/* Insert Alba's signature below her closing line when Zev provides it. */}
             </div>
 
-            <figure className="relative z-10 px-4 pb-0 pt-4 sm:px-8 sm:pt-8 lg:sticky lg:top-28 lg:self-start lg:pb-8">
+            <figure className="relative z-10 p-2 pb-0 md:px-8 md:pt-8 lg:sticky lg:top-28 lg:self-start lg:pb-8">
               <div
                 aria-hidden="true"
-                className="absolute inset-x-0 bottom-14 top-0 border border-primary/30 lg:bottom-0"
+                className="absolute inset-x-0 bottom-0 top-0 md:bottom-14 border border-primary/30 lg:bottom-0"
               />
               <div className="relative isolate aspect-[1287/966] w-full overflow-hidden rounded-t-[45%] bg-forest lg:max-h-[var(--portrait-height)]">
                 <img
                   src={creator.image}
                   alt={creator.imageAlt}
                   loading="lazy"
-                  className={`h-full w-full opacity-60 ${creator.portrait ? "object-contain" : "object-cover"}`}
+                  className="h-full w-full object-contain opacity-60"
                 />
                 <div
                   aria-hidden="true"
                   className="absolute inset-0 bg-gradient-to-t from-forest via-forest/10 to-forest/10"
                 />
-                {!creator.portrait && (
-                  <div className="absolute inset-x-0 bottom-8 text-center">
-                    <span className="text-[9px] uppercase tracking-[.25em] text-ivory/80">
-                      Portrait forthcoming
-                    </span>
-                  </div>
-                )}
               </div>
-              <figcaption className="relative flex items-center justify-between gap-4 py-5 text-[8px] uppercase tracking-[.2em] text-muted-foreground sm:text-[9px]">
-                <span>{creator.portrait ? "The creator" : "A detail from our world"}</span>
+              <figcaption className="relative flex flex-wrap items-center justify-between gap-x-3 gap-y-1 py-3 md:py-5 text-[8px] uppercase tracking-[.2em] text-muted-foreground sm:text-[9px]">
+                <span>{creator.imageCaption}</span>
                 <span className="text-primary">Thy House Of Art / 0{index + 1}</span>
               </figcaption>
             </figure>
@@ -239,16 +232,16 @@ function AboutTheArtists() {
         ))}
       </div>
 
-      <section className="mx-auto mt-24 max-w-[1400px] px-5 text-center sm:mt-32 sm:px-10">
-        <div className="border-y border-border px-4 py-12 sm:py-16">
+      <section className="mx-auto mt-6 max-w-[1400px] px-4 text-center sm:px-10 md:mt-32">
+        <div className="border-y border-border px-3 py-6 md:px-4 md:py-16">
           <Flower2 aria-hidden="true" className="mx-auto h-8 w-8 text-primary" strokeWidth={0.8} />
-          <p className="eyebrow mt-6">From our world to yours</p>
-          <h2 className="mt-5 text-4xl sm:text-6xl">
+          <p className="eyebrow mt-3 md:mt-6">From our world to yours</p>
+          <h2 className="mt-3 text-3xl sm:text-6xl md:mt-5">
             The story continues
             <br />
             <em className="text-accent">in every creation.</em>
           </h2>
-          <div className="mt-8 flex flex-col items-center justify-center gap-6 sm:flex-row sm:gap-10">
+          <div className="mt-5 flex flex-wrap items-center justify-center gap-3 md:mt-8 md:gap-10">
             <Link to="/shop" className="btn-art">
               Explore the collection{" "}
               <ArrowUpRight aria-hidden="true" className="h-4 w-4" strokeWidth={1.2} />

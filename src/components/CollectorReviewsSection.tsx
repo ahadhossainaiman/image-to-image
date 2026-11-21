@@ -42,6 +42,43 @@ export function CollectorReviewsSection({ reviews }: CollectorReviewsSectionProp
     };
   }, [emblaApi, onSelect]);
 
+  useEffect(() => {
+    if (!emblaApi) return;
+
+    const viewport = emblaApi.rootNode();
+    const setViewportHeight = (slide: Element) => {
+      viewport.style.setProperty(
+        "--review-viewport-height",
+        `${slide.getBoundingClientRect().height}px`,
+      );
+    };
+    const observer = new ResizeObserver(([entry]) => {
+      if (entry) setViewportHeight(entry.target);
+    });
+
+    const observeSelectedSlide = () => {
+      observer.disconnect();
+      const slide = emblaApi.slideNodes()[emblaApi.selectedScrollSnap()];
+      if (slide) {
+        observer.observe(slide);
+        setViewportHeight(slide);
+      } else {
+        viewport.style.removeProperty("--review-viewport-height");
+      }
+    };
+
+    emblaApi.on("select", observeSelectedSlide);
+    emblaApi.on("reInit", observeSelectedSlide);
+    observeSelectedSlide();
+
+    return () => {
+      observer.disconnect();
+      emblaApi.off("select", observeSelectedSlide);
+      emblaApi.off("reInit", observeSelectedSlide);
+      viewport.style.removeProperty("--review-viewport-height");
+    };
+  }, [emblaApi]);
+
   const scrollPrev = useCallback(() => {
     if (emblaApi) emblaApi.scrollPrev();
   }, [emblaApi]);
@@ -55,10 +92,13 @@ export function CollectorReviewsSection({ reviews }: CollectorReviewsSectionProp
     }
   }, [emblaApi]);
 
-  // Restart the autoplay delay whenever a different set is selected.
+  // Mobile cards change height, so keep the page steady while the collector reads.
   useEffect(() => {
     if (isPaused || !hasMultipleSets) return;
-    const interval = setInterval(scrollNext, 4500);
+    const multipleCards = window.matchMedia("(min-width: 48rem)");
+    const interval = setInterval(() => {
+      if (multipleCards.matches) scrollNext();
+    }, 4500);
     return () => clearInterval(interval);
   }, [hasMultipleSets, isPaused, scrollNext, selectedIndex]);
 
@@ -66,41 +106,40 @@ export function CollectorReviewsSection({ reviews }: CollectorReviewsSectionProp
 
   return (
     <section
-      className="relative mx-auto max-w-[1550px] px-5 py-24 sm:px-10 lg:py-32 overflow-hidden"
+      className="relative mx-auto max-w-[1550px] overflow-hidden px-4 py-7 sm:px-10 md:py-24 lg:py-32"
       aria-labelledby="collector-reflections-heading"
       onMouseEnter={() => setIsPaused(true)}
       onMouseLeave={() => setIsPaused(false)}
     >
       {/* Editorial Header */}
-      <div className="flex flex-col gap-8 md:flex-row md:items-end md:justify-between border-b border-border/50 pb-10">
+      <div className="flex flex-col gap-8 border-b border-border/50 pb-5 md:flex-row md:items-end md:justify-between md:pb-10">
         <div className="max-w-2xl">
           <div className="botanical-rule w-fit eyebrow">REFLECTIONS FROM OUR COLLECTORS</div>
           <h2
             id="collector-reflections-heading"
-            className="mt-6 text-5xl leading-[1.02] sm:text-6xl lg:text-7xl"
+            className="mt-4 text-4xl leading-[1.02] sm:text-6xl md:mt-6 lg:text-7xl"
           >
             Treasured in homes,
             <br />
             <em className="text-accent">held in hearts.</em>
           </h2>
-          <p className="mt-4 font-display text-xl italic text-foreground/90 sm:text-2xl">
+          <p className="mt-3 font-display text-xl italic text-foreground/90 sm:text-2xl md:mt-4">
             Every element has a level of care, artistry and love.
           </p>
-          <p className="mt-3 max-w-lg text-sm leading-7 text-muted-foreground">
+          <p className="mt-2 max-w-lg text-sm leading-relaxed text-muted-foreground md:mt-3 md:leading-7">
             Unscripted words from collectors who welcomed our one-of-a-kind celestial figures,
             guardian angels, and embroidered sculptures into their private worlds.
           </p>
         </div>
       </div>
 
-      {/* Navigation sits beside the cards, centered vertically. */}
-      <div className="relative mt-14 grid grid-cols-[2rem_minmax(0,1fr)_2rem] items-center gap-2 -mx-3 sm:-mx-6 sm:grid-cols-[3rem_minmax(0,1fr)_3rem] sm:gap-4">
+      <div className="relative -mx-2 mt-5 grid grid-cols-[2rem_minmax(0,1fr)_2rem] items-center gap-1 md:-mx-6 md:mt-14 md:grid-cols-[3rem_minmax(0,1fr)_3rem] md:gap-4">
         <button
           type="button"
           onClick={scrollPrev}
           disabled={!canScrollPrev}
           aria-label="Previous collector review"
-          className="group relative flex h-8 w-8 sm:h-12 sm:w-12 items-center justify-center rounded-full border border-primary/35 bg-background/60 backdrop-blur-md transition-all duration-300 enabled:hover:border-primary enabled:hover:bg-primary enabled:hover:text-primary-foreground enabled:hover:scale-105 active:scale-95 disabled:opacity-30 disabled:cursor-not-allowed shadow-md"
+          className="group relative flex size-8 items-center justify-center rounded-full border border-primary/35 bg-background/60 shadow-md backdrop-blur-md transition-all duration-300 enabled:hover:scale-105 enabled:hover:border-primary enabled:hover:bg-primary enabled:hover:text-primary-foreground active:scale-95 disabled:cursor-not-allowed disabled:opacity-30 max-md:after:absolute max-md:after:-inset-1.5 md:size-12"
         >
           <ChevronLeft
             className="h-5 w-5 transition-transform duration-300 group-hover:-translate-x-0.5"
@@ -108,21 +147,21 @@ export function CollectorReviewsSection({ reviews }: CollectorReviewsSectionProp
           />
         </button>
         {/* Embla Slider Viewport */}
-        <div className="min-w-0 overflow-hidden" ref={emblaRef}>
-          <div className="flex -ml-6 touch-pan-y">
+        <div className="min-w-0 overflow-hidden max-md:h-(--review-viewport-height)" ref={emblaRef}>
+          <div className="flex touch-pan-y max-md:items-start md:-ml-6">
             {reviews.map((review, index) => {
               const isDark = review.theme === "dark";
               const collector = getCollectorIdentity(review);
               return (
                 <div
                   key={review.id || index}
-                  className="min-w-0 shrink-0 grow-0 basis-full pl-6 md:basis-1/2 lg:basis-1/3"
+                  className="min-w-0 shrink-0 grow-0 basis-full md:basis-1/2 md:pl-6 lg:basis-1/3"
                 >
                   <article
-                    className={`group relative flex h-full flex-col justify-between p-8 sm:p-9 rounded-sm transition-all duration-500 ease-out select-none ${
+                    className={`group relative flex flex-col rounded-sm p-4 transition-all duration-500 ease-out select-none sm:p-6 md:h-full md:justify-between md:p-9 ${
                       isDark
-                        ? "glass-panel bg-background/85 border-border/70 hover:border-primary/70 hover:shadow-[0_22px_55px_-18px_oklch(0.77_0.12_86_/_0.28)] hover:-translate-y-2.5"
-                        : "glass-panel bg-primary/[0.045] border-primary/30 hover:border-primary/80 hover:shadow-[0_22px_55px_-18px_oklch(0.77_0.12_86_/_0.32)] hover:-translate-y-2.5"
+                        ? "glass-panel bg-background/85 border-border/70 hover:border-primary/70 hover:shadow-[0_22px_55px_-18px_oklch(0.77_0.12_86_/_0.28)] md:hover:-translate-y-2.5"
+                        : "glass-panel bg-primary/[0.045] border-primary/30 hover:border-primary/80 hover:shadow-[0_22px_55px_-18px_oklch(0.77_0.12_86_/_0.32)] md:hover:-translate-y-2.5"
                     }`}
                   >
                     {/* Subtle inner ambient glow on hover */}
@@ -140,7 +179,7 @@ export function CollectorReviewsSection({ reviews }: CollectorReviewsSectionProp
                     {/* Content Container */}
                     <div className="relative z-10 flex flex-1 flex-col">
                       {/* Stars and Verified Badge */}
-                      <div className="flex items-center justify-between gap-3 border-b border-border/40 pb-4">
+                      <div className="flex flex-wrap items-center justify-between gap-x-3 gap-y-2 border-b border-border/40 pb-3 md:pb-4">
                         <div
                           className="flex items-center gap-1.5 text-accent"
                           aria-label={`${review.stars} out of 5 stars`}
@@ -165,20 +204,20 @@ export function CollectorReviewsSection({ reviews }: CollectorReviewsSectionProp
                       </div>
 
                       {/* Card Title */}
-                      <h3 className="mt-6 font-display text-2xl font-normal leading-snug text-foreground transition-colors duration-300 group-hover:text-accent sm:text-[1.65rem]">
+                      <h3 className="mt-3 font-display text-2xl font-normal leading-snug text-foreground transition-colors duration-300 group-hover:text-accent md:mt-6 md:text-[1.65rem]">
                         {review.title}
                       </h3>
 
                       {/* Review Quote */}
-                      <p className="mt-4 flex-1 font-display text-[0.98rem] italic leading-relaxed text-foreground/85 transition-colors duration-300 group-hover:text-foreground whitespace-pre-line">
+                      <p className="mt-2 font-display text-[0.98rem] italic leading-relaxed whitespace-pre-line text-foreground/85 transition-colors duration-300 group-hover:text-foreground md:mt-4 md:flex-1">
                         {review.quote}
                       </p>
                     </div>
 
                     {/* Collector details from CMS, above the verification rule. */}
-                    <footer className="relative z-10 mt-8">
+                    <footer className="relative z-10 mt-4 md:mt-8">
                       {(collector.name || collector.location) && (
-                        <div className="mb-5">
+                        <div className="mb-3 md:mb-5">
                           {collector.name && (
                             <p className="font-display text-lg leading-snug text-foreground transition-colors duration-300 group-hover:text-accent">
                               {collector.name}
@@ -191,7 +230,7 @@ export function CollectorReviewsSection({ reviews }: CollectorReviewsSectionProp
                           )}
                         </div>
                       )}
-                      <div className="border-t border-border/40 pt-5">
+                      <div className="border-t border-border/40 pt-3 md:pt-5">
                         <p className="text-[9px] uppercase tracking-[.22em] text-muted-foreground transition-colors duration-300 group-hover:text-primary">
                           Verified Collector
                         </p>
@@ -209,7 +248,7 @@ export function CollectorReviewsSection({ reviews }: CollectorReviewsSectionProp
           onClick={scrollNext}
           disabled={!hasMultipleSets}
           aria-label="Next collector review"
-          className="group relative flex h-8 w-8 sm:h-12 sm:w-12 items-center justify-center rounded-full border border-primary/35 bg-background/60 backdrop-blur-md transition-all duration-300 enabled:hover:border-primary enabled:hover:bg-primary enabled:hover:text-primary-foreground enabled:hover:scale-105 active:scale-95 disabled:opacity-30 disabled:cursor-not-allowed shadow-md"
+          className="group relative flex size-8 items-center justify-center rounded-full border border-primary/35 bg-background/60 shadow-md backdrop-blur-md transition-all duration-300 enabled:hover:scale-105 enabled:hover:border-primary enabled:hover:bg-primary enabled:hover:text-primary-foreground active:scale-95 disabled:cursor-not-allowed disabled:opacity-30 max-md:after:absolute max-md:after:-inset-1.5 md:size-12"
         >
           <ChevronRight
             className="h-5 w-5 transition-transform duration-300 group-hover:translate-x-0.5"
@@ -219,7 +258,7 @@ export function CollectorReviewsSection({ reviews }: CollectorReviewsSectionProp
       </div>
 
       {/* Bottom Quiet Reassurance */}
-      <div className="mt-12 flex items-center justify-center gap-3 text-center">
+      <div className="mt-5 flex items-center justify-center gap-3 text-center md:mt-12">
         <Sparkles className="h-3 w-3 text-primary animate-soft-pulse" strokeWidth={1} />
         <p className="text-[9px] uppercase tracking-[.26em] text-primary">
           Every artwork is made once by hand · Preserving singular stories
