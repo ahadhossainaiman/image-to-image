@@ -9,6 +9,7 @@ import { InquiryDialog } from "@/components/InquiryDialog";
 import { CertificateStatement } from "@/components/CertificateStatement";
 import { CollectorReviewsSection } from "@/components/CollectorReviewsSection";
 import { CollectionImage } from "@/components/CollectionImage";
+import { getPageHead } from "@/lib/seo";
 
 export const Route = createFileRoute("/")({
   loader: async () => {
@@ -23,14 +24,7 @@ export const Route = createFileRoute("/")({
       reviews,
     };
   },
-  head: () => ({ meta: [
-    { title: "Thy House Of Art — Where Angels & Fairies Live" },
-    { name: "description", content: "Discover singular handmade angel, fairy and embroidered merino wool sculptures in an enchanted luxury art atelier." },
-    { property: "og:title", content: "Thy House Of Art — Where Angels & Fairies Live" },
-    { property: "og:description", content: "One-of-a-kind handmade works where art, magic and artistry converge." },
-    { property: "og:type", content: "website" },
-    { name: "twitter:card", content: "summary_large_image" },
-  ] }),
+  head: () => getPageHead("/"),
   component: Index,
 });
 
@@ -38,11 +32,16 @@ function Index() {
   const { selectedWorks, categories, reviews } = Route.useLoaderData();
   const taglineRowRef = useRef<HTMLDivElement>(null);
   const taglineRef = useRef<HTMLParagraphElement>(null);
+  const subtitleRef = useRef<HTMLSpanElement>(null);
 
   useLayoutEffect(() => {
     const row = taglineRowRef.current;
     const tagline = taglineRef.current;
-    if (!row || !tagline) return;
+    const subtitle = subtitleRef.current;
+    const subtitleRow = subtitle?.parentElement;
+    if (!row || !tagline || !subtitle || !subtitleRow) return;
+
+    const compactLayout = window.matchMedia("(width < 64rem)");
 
     const fitTagline = () => {
       const targetWidth = row.getBoundingClientRect().width;
@@ -50,17 +49,37 @@ function Index() {
       if (!targetWidth || !textWidth || Math.abs(targetWidth - textWidth) < 0.5) return;
 
       const fontSize = Number.parseFloat(getComputedStyle(tagline).fontSize);
-      tagline.style.fontSize = `${fontSize * (targetWidth / textWidth)}px`;
+      tagline.style.setProperty("--home-tagline-size", `${fontSize * (targetWidth / textWidth)}px`);
     };
 
-    fitTagline();
+    const fitHeroText = () => {
+      if (!compactLayout.matches) {
+        fitTagline();
+        return;
+      }
+
+      const availableWidth = subtitleRow.getBoundingClientRect().width - 1;
+      const textWidth = subtitle.getBoundingClientRect().width;
+      if (!availableWidth || !textWidth) return;
+
+      const preferredSize = Number.parseFloat(getComputedStyle(subtitleRow).fontSize);
+      const currentSize = Number.parseFloat(getComputedStyle(subtitle).fontSize);
+      const nextSize = Math.min(preferredSize, (currentSize * availableWidth) / textWidth);
+      if (textWidth <= availableWidth && Math.abs(nextSize - currentSize) < 0.05) return;
+
+      subtitle.style.setProperty("--home-subtitle-size", `${nextSize}px`);
+    };
+
+    fitHeroText();
     let frame = 0;
     const observer = new ResizeObserver(() => {
       cancelAnimationFrame(frame);
-      frame = requestAnimationFrame(fitTagline);
+      frame = requestAnimationFrame(fitHeroText);
     });
     observer.observe(row);
     observer.observe(tagline);
+    observer.observe(subtitleRow);
+    observer.observe(subtitle);
 
     return () => {
       observer.disconnect();
@@ -81,20 +100,26 @@ function Index() {
         />
         <div className="hero-vignette absolute inset-0" />
         <div className="relative mx-auto w-full max-w-[1600px] px-4 py-8 sm:px-8 md:py-16 lg:py-20">
-          <div className="glass-panel mx-auto grid w-full max-w-xl grid-cols-[fit-content(100%)_minmax(0,1fr)] p-5 sm:p-7 md:p-10 lg:mx-0 lg:ml-[2vw] xl:ml-[4vw] lg:max-w-xl xl:max-w-2xl lg:p-14">
-            <div className="botanical-rule eyebrow max-sm:gap-2 max-sm:before:w-4 max-sm:after:w-4 max-[25rem]:tracking-[.12em] max-[22.5rem]:gap-1 max-[22.5rem]:tracking-[.08em] max-[22.5rem]:before:w-2 max-[22.5rem]:after:w-2">
+          <div className="glass-panel mx-auto grid w-full max-w-xl grid-cols-[fit-content(100%)_minmax(0,1fr)] p-5 max-lg:@container max-lg:grid-cols-[minmax(0,1fr)_clamp(30%,19vw,36%)] sm:p-7 md:p-10 lg:mx-0 lg:ml-[2vw] xl:ml-[4vw] lg:max-w-xl xl:max-w-2xl lg:p-14">
+            <div className="botanical-rule eyebrow max-lg:col-span-2 max-sm:gap-2 max-sm:before:w-4 max-sm:after:w-4 max-[25rem]:tracking-[.12em] max-[22.5rem]:gap-1 max-[22.5rem]:tracking-[.08em] max-[22.5rem]:before:w-2 max-[22.5rem]:after:w-2">
               An enchanted fine art atelier
             </div>
-            <h1 className="col-span-2 mt-6 text-[2.75rem] leading-[.9] tracking-[-.025em] sm:text-7xl md:text-8xl lg:text-[6.2rem] xl:text-[6.8rem]">
+            <h1 className="col-span-2 mt-6 leading-[.9] tracking-[-.025em] max-lg:col-span-1 max-lg:text-[clamp(2rem,11.5vw,4.25rem)] max-lg:whitespace-nowrap lg:text-[6.2rem] xl:text-[6.8rem]">
               Thy House<br /><em className="font-normal text-accent">Of Art</em>
             </h1>
-            <div ref={taglineRowRef} className="mt-5 [contain:inline-size] sm:mt-6">
-              <p ref={taglineRef} className="eyebrow w-max text-[.72rem] tracking-[.08em] whitespace-nowrap sm:text-sm">
+            <picture aria-hidden="true" className="pointer-events-none relative col-start-2 row-start-2 -mt-2 -mr-5 min-h-[min(18vw,11rem)] overflow-hidden select-none [mask-image:linear-gradient(to_bottom,black_68%,transparent)] sm:-mr-7 md:-mr-10 lg:hidden">
+              <source media="(width < 64rem)" srcSet="/Golden_Fairy_with_Butterfly_Wings.png" />
+              <img alt="" width={971} height={1620} className="absolute inset-x-0 top-0 h-auto w-full" />
+            </picture>
+            <div ref={taglineRowRef} className="mt-5 [contain:inline-size] max-lg:col-span-2 sm:mt-6">
+              <p ref={taglineRef} className="eyebrow text-[.72rem] tracking-[.08em] whitespace-nowrap max-lg:leading-snug sm:text-sm lg:w-max lg:text-[length:var(--home-tagline-size,var(--text-sm))]">
                 DISCOVER THE BEAUTY WITHIN™
               </p>
             </div>
-            <p className="col-span-2 mt-4 font-display text-xl italic leading-snug text-foreground sm:mt-5 sm:text-2xl lg:text-3xl">
-              Where Art, Magic & Artistry Converge
+            <p className="col-span-2 mt-4 font-display italic leading-snug text-foreground max-lg:text-[clamp(.9375rem,6.65cqw,1.75rem)] sm:mt-5 lg:text-3xl">
+              <span ref={subtitleRef} className="max-lg:block max-lg:w-max max-lg:whitespace-nowrap max-lg:text-[length:var(--home-subtitle-size,inherit)]">
+                Where Art, Magic & Artistry Converge
+              </span>
             </p>
             <p className="col-span-2 mt-3 max-w-md text-xs leading-6 text-muted-foreground sm:mt-4 sm:text-sm sm:leading-7">
               One-of-a-kind handmade creations, shaped slowly and finished with wonder. Each work is an invitation into a world that exists only once.
@@ -118,7 +143,7 @@ function Index() {
         </a>
       </section>
 
-      <section id="collections" className="relative mx-auto max-w-[1500px] scroll-mt-20 px-4 py-9 sm:px-10 md:scroll-mt-24 md:py-24 lg:py-32">
+      <section id="collections" className="relative mx-auto max-w-[1500px] scroll-mt-20 px-4 py-9 sm:px-10 md:scroll-mt-24 md:py-24 lg:pb-20">
         <div className="mx-auto max-w-3xl text-center">
           <div className="botanical-rule mx-auto w-fit eyebrow">The collections</div>
           <h2 className="mt-3 text-4xl leading-[1.02] sm:mt-6 sm:text-6xl">Step into our <em className="text-accent">enchanted worlds</em></h2>
@@ -156,7 +181,7 @@ function Index() {
         </div>
       </section>
 
-      <section className="px-4 py-4 sm:px-10 md:py-10 lg:py-20">
+      <section className="px-4 py-4 sm:px-10 md:py-10 lg:py-16">
         <div className="glass-panel relative mx-auto grid max-w-[1400px] overflow-hidden lg:grid-cols-[.85fr_1.15fr]">
           <div className="relative aspect-[4/3] overflow-hidden md:min-h-[430px] lg:aspect-auto lg:min-h-[650px]">
             <img src={angelDetail} alt="Intricate hand-beaded celestial wing in gold and pearl" loading="lazy" className="absolute inset-0 h-full w-full object-cover" />
@@ -185,7 +210,7 @@ function Index() {
         </div>
       </section>
 
-      <section className="mx-auto max-w-[1400px] px-4 pt-7 pb-5 sm:px-10 md:py-24 lg:py-32">
+      <section className="mx-auto max-w-[1400px] px-4 pt-7 pb-5 sm:px-10 md:py-24 lg:pt-20 lg:pb-18">
         <div className="flex flex-col gap-3 border-b border-border pb-4 sm:gap-6 sm:pb-8 sm:flex-row sm:items-end sm:justify-between">
           <div><p className="eyebrow">Selected works</p><h2 className="mt-2 text-4xl sm:mt-4 sm:text-6xl">From the atelier</h2><CertificateStatement className="mt-3 max-w-xl sm:mt-5" /></div>
           <Link to="/shop" className="flex w-fit items-center gap-3 text-[10px] uppercase tracking-[.2em] text-primary hover:text-accent">View all works <ArrowUpRight className="h-4 w-4" /></Link>
@@ -198,7 +223,7 @@ function Index() {
       {/* Collector Reflections & Reviews */}
       <CollectorReviewsSection reviews={reviews} />
 
-      <section className="px-4 pb-3 sm:px-10 md:pb-20">
+      <section className="px-4 pb-3 sm:px-10 md:pb-20 lg:pb-12">
         <div className="glass-panel mx-auto max-w-[1400px] px-4 py-7 text-center sm:px-7 md:px-12 md:py-20 lg:py-28">
           <Sparkles className="mx-auto h-6 w-6 text-primary" strokeWidth={.9} />
           <p className="eyebrow mt-4 sm:mt-7">A work of your own</p>

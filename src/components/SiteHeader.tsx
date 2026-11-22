@@ -1,7 +1,7 @@
 import { Link } from "@tanstack/react-router";
 import { createPortal } from "react-dom";
 import { useEffect, useState, type FormEvent } from "react";
-import { ArrowRight, Instagram, LockKeyhole, Menu, ShoppingBag, Sparkles, X } from "lucide-react";
+import { ArrowRight, Instagram, LockKeyhole, Menu, ShoppingBag, X } from "lucide-react";
 import { useCart } from "@/lib/cart";
 import { currencyOptions, useCurrency, type CurrencyCode } from "@/lib/currency";
 import { CartDrawer } from "@/components/CartDrawer";
@@ -14,16 +14,10 @@ const nav = [
   { to: "/contact", label: "Bespoke Inquiry" },
 ] as const;
 
-function Brand() {
+function Brand({ logoClassName = "h-auto w-30 sm:w-38" }: { logoClassName?: string }) {
   return (
-    <Link to="/" className="group flex min-w-0 items-center gap-2 sm:gap-3" aria-label="Thy House Of Art home">
-      <span className="flex size-8 shrink-0 items-center sm:size-9 justify-center rounded-full border border-primary/35 transition-colors group-hover:bg-primary/10">
-        <Sparkles className="h-3.5 w-3.5 text-primary" strokeWidth={1.1} />
-      </span>
-      <span>
-        <span className="block font-display text-[1.25rem] leading-none sm:text-[1.55rem] sm:tracking-[.025em]">Thy House Of Art</span>
-        <span className="mt-1 hidden text-[7px] uppercase tracking-[.32em] text-primary sm:block">Discover the beauty within™</span>
-      </span>
+    <Link to="/" className="block w-fit min-w-0 max-w-full" aria-label="Thy House Of Art home">
+      <img src="/Thy_House_Of_Art_Logo.png" alt="Thy House Of Art" width={2000} height={1000} className={logoClassName} />
     </Link>
   );
 }
@@ -128,7 +122,7 @@ export function SiteFooter() {
       <div className="mx-auto max-w-[1600px] px-4 py-7 sm:px-10 md:py-16 lg:px-8 lg:py-20">
         <div className="grid gap-6 md:gap-12 lg:grid-cols-[1.1fr_.7fr_1.2fr] lg:gap-20">
           <div>
-            <Brand />
+            <Brand logoClassName="h-auto w-52 sm:w-60" />
             <p className="mt-3 max-w-sm text-sm leading-relaxed md:mt-6 md:leading-7 text-muted-foreground">Collectors find great value in art that moves them. They see the world differently and seek art that stirs their emotions and captivates their souls. With that, they discover that everything created with love, talent and intention holds a little magic.</p>
             <div className="mt-3 flex items-center gap-2 md:mt-7 md:gap-3 text-[10px] uppercase tracking-[.17em] text-muted-foreground"><LockKeyhole className="h-3.5 w-3.5 text-primary" strokeWidth={1.2} /> A SECURE COLLECTOR'S EXPERIENCE</div>
           </div>

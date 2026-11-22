@@ -106,7 +106,7 @@ export function CollectorReviewsSection({ reviews }: CollectorReviewsSectionProp
 
   return (
     <section
-      className="relative mx-auto max-w-[1550px] overflow-hidden px-4 py-7 sm:px-10 md:py-24 lg:py-32"
+      className="relative mx-auto max-w-[1550px] overflow-hidden px-4 py-7 sm:px-10 md:py-24 lg:py-20"
       aria-labelledby="collector-reflections-heading"
       onMouseEnter={() => setIsPaused(true)}
       onMouseLeave={() => setIsPaused(false)}

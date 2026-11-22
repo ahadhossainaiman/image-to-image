@@ -2,16 +2,10 @@ import { createFileRoute, useSearch } from "@tanstack/react-router";
 import { useEffect, useRef, useState, type FormEvent } from "react";
 import { Clock3, Gem, MessageCircle, Save, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { getPageHead } from "@/lib/seo";
 
 export const Route = createFileRoute("/contact")({
-  head: () => ({ meta: [
-    { title: "Bespoke Inquiry — Thy House Of Art" },
-    { name: "description", content: "Begin a private conversation about acquiring an artwork or commissioning a singular piece from Thy House Of Art." },
-    { property: "og:title", content: "Bespoke Inquiry — Thy House Of Art" },
-    { property: "og:description", content: "Share your vision with the atelier and begin a bespoke artwork conversation." },
-    { property: "og:type", content: "website" },
-    { name: "twitter:card", content: "summary_large_image" },
-  ] }),
+  head: () => getPageHead("/contact"),
   component: Contact,
 });
 

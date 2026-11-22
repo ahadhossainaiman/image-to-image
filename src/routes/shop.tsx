@@ -3,6 +3,7 @@ import { useMemo, useState } from "react";
 import { SlidersHorizontal } from "lucide-react";
 import { getArtworks, getCategories } from "@/lib/wix";
 import { ArtCard } from "@/components/ArtCard";
+import { getPageHead } from "@/lib/seo";
 
 export const Route = createFileRoute("/shop")({
   loader: async () => {
@@ -12,14 +13,7 @@ export const Route = createFileRoute("/shop")({
     ]);
     return { artworks, categories };
   },
-  head: () => ({ meta: [
-    { title: "The Gallery — Thy House Of Art" },
-    { name: "description", content: "Explore one-of-a-kind celestial sculptures and hand-embroidered merino wool artworks from Thy House Of Art." },
-    { property: "og:title", content: "The Gallery — Thy House Of Art" },
-    { property: "og:description", content: "Browse singular handmade works from the enchanted atelier." },
-    { property: "og:type", content: "website" },
-    { name: "twitter:card", content: "summary_large_image" },
-  ] }),
+  head: () => getPageHead("/shop"),
   component: Shop,
 });
 

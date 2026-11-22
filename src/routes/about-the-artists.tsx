@@ -1,6 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { ArrowDown, ArrowUpRight, Flower2, Sparkles } from "lucide-react";
 import type { ReactNode } from "react";
+import { getPageHead } from "@/lib/seo";
 
 type Creator = {
   id: string;
@@ -90,19 +91,7 @@ const creators: Creator[] = [
 ];
 
 export const Route = createFileRoute("/about-the-artists")({
-  head: () => ({
-    meta: [
-      { title: "About The Artists — Thy House Of Art" },
-      {
-        name: "description",
-        content: "Meet Alba Amóre and Zev Amóre, the artists behind Thy House Of Art.",
-      },
-      { property: "og:title", content: "About The Artists — Thy House Of Art" },
-      { property: "og:description", content: "Discover the artists behind Thy House Of Art." },
-      { property: "og:type", content: "website" },
-      { name: "twitter:card", content: "summary_large_image" },
-    ],
-  }),
+  head: () => getPageHead("/about-the-artists"),
   component: AboutTheArtists,
 });
 
@@ -206,7 +195,7 @@ function AboutTheArtists() {
               {/* Insert Alba's signature below her closing line when Zev provides it. */}
             </div>
 
-            <figure className="relative z-10 p-2 pb-0 md:px-8 md:pt-8 lg:sticky lg:top-28 lg:self-start lg:pb-8">
+            <figure className="relative z-10 p-2 pb-0 max-lg:order-first md:px-8 md:pt-8 lg:sticky lg:top-28 lg:self-start lg:pb-8">
               <div
                 aria-hidden="true"
                 className="absolute inset-x-0 bottom-0 top-0 md:bottom-14 border border-primary/30 lg:bottom-0"

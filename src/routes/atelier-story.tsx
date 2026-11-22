@@ -2,16 +2,10 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { ArrowRight, Feather, Gem, Heart, Sparkles } from "lucide-react";
 import angel2 from "@/assets/angel-2.jpg";
 import forestHero from "@/assets/enchanted-forest-hero.jpg";
+import { getPageHead } from "@/lib/seo";
 
 export const Route = createFileRoute("/atelier-story")({
-  head: () => ({ meta: [
-    { title: "Atelier Story — Thy House Of Art" },
-    { name: "description", content: "Enter the story and handmade philosophy behind Thy House Of Art’s singular celestial and woodland sculptures." },
-    { property: "og:title", content: "Atelier Story — Thy House Of Art" },
-    { property: "og:description", content: "An independent art house where artistry, storytelling and wonder meet." },
-    { property: "og:type", content: "website" },
-    { name: "twitter:card", content: "summary_large_image" },
-  ] }),
+  head: () => getPageHead("/atelier-story"),
   component: AtelierStory,
 });
 

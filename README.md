@@ -21,6 +21,17 @@ npm i
 npm run dev
 ```
 
+## Production SEO
+
+Set `VITE_SITE_URL` to the site's canonical public origin before running
+`npm run build`. The build writes page-specific HTML, `robots.txt`, and
+`sitemap.xml` to `dist/`.
+
+Serve `index.html` for `/` and resolve the five public URLs and `/cart` to
+their matching HTML files before applying an SPA rewrite. Use `spa.html`
+for client-rendered routes such as individual artwork and collection pages.
+`npm run preview` uses this routing locally.
+
 ## Built with
 
 - TanStack Start
