@@ -37,12 +37,16 @@ export function formatInCurrency(
   currency: CurrencyCode,
 ) {
   if (artwork.price == null) return "Price on request";
-  const converted = convertAmount(artwork.price, artwork.currency, currency);
+  const source = artwork.currency.trim().toUpperCase();
+  const canConvert = currencyOptions.some((option) => option.code === source);
+  const displayCurrency = canConvert || !/^[A-Z]{3}$/.test(source) ? currency : source;
+  const amount = canConvert ? convertAmount(artwork.price, source, currency) : artwork.price;
   return new Intl.NumberFormat("en-US", {
     style: "currency",
-    currency,
-    maximumFractionDigits: 0,
-  }).format(converted);
+    currency: displayCurrency,
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 2,
+  }).format(amount);
 }
 
 export function useCurrency() {

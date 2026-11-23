@@ -1,29 +1,39 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
-import { useRef, useState } from "react";
+import { useState } from "react";
 import { ArrowLeft, ChevronRight, MessageCircle, ShieldCheck, ShoppingBag, Sparkles } from "lucide-react";
-import { getArtworkBySlug, getCategoryBySlug } from "@/lib/wix";
-import type { Artwork } from "@/data/catalog";
+import { getArtworkBySlug, getCategoryBySlugOrId } from "@/lib/wix";
+import type { Artwork, Category } from "@/data/catalog";
 import { addToCart, useCart } from "@/lib/cart";
 import { useCurrency } from "@/lib/currency";
 import { InquiryDialog } from "@/components/InquiryDialog";
 import { CertificateStatement } from "@/components/CertificateStatement";
+import { ArtworkGallery } from "@/components/ArtworkGallery";
+import { WixArtworkDetails } from "@/components/WixArtworkDetails";
+import { CatalogLoading } from "@/components/CatalogLoading";
 
 export const Route = createFileRoute("/artwork/$slug")({
+  pendingComponent: () => <CatalogLoading page="artwork" />,
+  pendingMs: 160,
+  pendingMinMs: 180,
+  staleTime: 30_000,
+  preloadStaleTime: 30_000,
   loader: async ({ params }) => {
     const artwork = await getArtworkBySlug(params.slug);
-    if (!artwork) throw notFound();
-    const category = await getCategoryBySlug(artwork.category);
+    if (!artwork?.published) throw notFound();
+    const categoryKeys = artwork.wixCollectionIds ?? [artwork.category];
+    const categories = (await Promise.all([...new Set(categoryKeys)].map(getCategoryBySlugOrId)))
+      .filter((category): category is Category => Boolean(category?.published));
     return {
       artwork,
-      category,
+      categories,
     };
   },
   head: ({ loaderData }) => loaderData?.artwork ? {
     meta: [
       { title: `${loaderData.artwork.title} — Thy House Of Art` },
-      { name: "description", content: loaderData.artwork.intro },
+      { name: "description", content: loaderData.artwork.description || loaderData.artwork.intro || loaderData.artwork.title },
       { property: "og:title", content: `${loaderData.artwork.title} — Thy House Of Art` },
-      { property: "og:description", content: loaderData.artwork.intro },
+      { property: "og:description", content: loaderData.artwork.description || loaderData.artwork.intro || loaderData.artwork.title },
       { property: "og:type", content: "product" },
       { name: "twitter:card", content: "summary_large_image" },
     ],
@@ -36,8 +46,8 @@ export const Route = createFileRoute("/artwork/$slug")({
         description: loaderData.artwork.description,
         artMedium: loaderData.artwork.medium,
         artform: "Sculpture",
-        sku: loaderData.artwork.reference,
-        brand: { "@type": "Brand", name: "Thy House Of Art" },
+        sku: loaderData.artwork.wixDetails ? loaderData.artwork.wixDetails.sku || undefined : loaderData.artwork.reference,
+        brand: { "@type": "Brand", name: loaderData.artwork.wixDetails?.brand || "Thy House Of Art" },
         additionalProperty: { "@type": "PropertyValue", name: "Edition", value: "One of one" },
       }),
     }],
@@ -58,7 +68,7 @@ function AcquisitionButton({ artwork, compact = false }: { artwork: Artwork; com
   if (artwork.price == null) {
     return (
       <InquiryDialog artwork={artwork.title}>
-        <button className={compact ? "btn-art min-h-11 px-5 py-3" : "btn-art w-full"}>
+        <button className={compact ? "btn-art min-h-11 shrink-0 gap-2 px-3 py-2 tracking-[.12em]" : "btn-art w-full"}>
           Acquire artwork <ChevronRight className="h-4 w-4" />
         </button>
       </InquiryDialog>
@@ -67,7 +77,7 @@ function AcquisitionButton({ artwork, compact = false }: { artwork: Artwork; com
   return (
     <button
       type="button"
-      className={compact ? "btn-art min-h-11 px-5 py-3 cursor-pointer" : "btn-art w-full cursor-pointer"}
+      className={compact ? "btn-art min-h-11 shrink-0 cursor-pointer gap-2 px-3 py-2 tracking-[.12em]" : "btn-art w-full cursor-pointer"}
       disabled={inCart || isAdding}
       onClick={handleAdd}
     >
@@ -77,84 +87,80 @@ function AcquisitionButton({ artwork, compact = false }: { artwork: Artwork; com
 }
 
 function ArtworkPage() {
-  const { artwork, category } = Route.useLoaderData();
+  const { artwork, categories } = Route.useLoaderData();
   const { formatPrice } = useCurrency();
-  const [activeImage, setActiveImage] = useState(0);
-  const galleryRef = useRef<HTMLDivElement>(null);
-
-  function scrollToImage(index: number) {
-    const gallery = galleryRef.current;
-    if (!gallery) return;
-    gallery.scrollTo({ left: gallery.clientWidth * index, behavior: "smooth" });
-    setActiveImage(index);
-  }
+  const category = categories[0];
+  const details = artwork.wixDetails;
+  const price = formatPrice(artwork);
 
   return (
     <div className="pb-24 md:pb-0">
       <div className="mx-auto max-w-[1500px] px-5 pt-7 sm:px-10 md:pt-10">
-        <Link to="/collections/$slug" params={{ slug: artwork.category }} className="flex w-fit items-center gap-3 text-[9px] uppercase tracking-[.2em] text-muted-foreground hover:text-accent">
+        <Link
+          {...(category
+            ? { to: "/collections/$slug", params: { slug: category.slug } } as const
+            : { to: "/shop" } as const)}
+          preload="intent"
+          className="flex w-fit items-center gap-3 text-[9px] uppercase tracking-[.2em] text-muted-foreground hover:text-accent"
+        >
           <ArrowLeft className="h-4 w-4" /> {category?.shortName ?? "The gallery"}
         </Link>
       </div>
-      <div className="mx-auto mt-7 grid max-w-[1500px] md:grid-cols-[1.25fr_.75fr] md:gap-10 md:px-10 lg:gap-16">
-        <div
-          ref={galleryRef}
-          onScroll={(event) => {
-            const element = event.currentTarget;
-            if (window.innerWidth < 768) setActiveImage(Math.min(artwork.images.length - 1, Math.round(element.scrollLeft / element.clientWidth)));
-          }}
-          className="flex snap-x snap-mandatory overflow-x-auto md:flex-col md:gap-8 md:overflow-visible"
-        >
-          {artwork.images.map((image, index) => (
-            <div key={image.src} className="w-full shrink-0 snap-center md:glass-panel md:p-3">
-              <img
-                src={image.src}
-                alt={image.alt}
-                loading={index === 0 ? "eager" : "lazy"}
-                className="aspect-[4/5] w-full object-cover md:aspect-auto"
-              />
-              <p className="hidden px-2 pb-2 pt-4 text-[9px] uppercase tracking-[.18em] text-muted-foreground md:block">View {String(index + 1).padStart(2, "0")} / {String(artwork.images.length).padStart(2, "0")}</p>
-            </div>
-          ))}
-        </div>
+      <div className="mx-auto mt-4 grid max-w-[1500px] md:mt-7 md:grid-cols-[1.25fr_.75fr] md:gap-10 md:px-10 lg:gap-16">
+        <ArtworkGallery key={artwork.slug} items={details?.gallery ?? artwork.images} />
 
-        <div className="mt-5 flex justify-center gap-2 md:hidden" aria-label="Artwork image navigation">
-          {artwork.images.map((image, index) => (
-            <button key={image.src} aria-label={`Show artwork image ${index + 1}`} aria-current={activeImage === index} onClick={() => scrollToImage(index)} className="p-2">
-              <span className={`block h-1.5 rounded-full transition-all ${activeImage === index ? "w-7 bg-primary" : "w-1.5 bg-muted-foreground/50"}`} />
-            </button>
-          ))}
-        </div>
-
-        <aside className="px-5 pt-9 sm:px-10 md:sticky md:top-28 md:self-start md:px-0 md:pt-0">
-          <div className="glass-panel p-7 sm:p-9">
-            <div className="flex items-center justify-between gap-5">
-              <p className="eyebrow">{artwork.medium}</p>
-              <Sparkles className="h-4 w-4 shrink-0 text-primary" strokeWidth={1} />
+        <aside className="min-w-0 px-5 pt-5 sm:px-10 md:sticky md:top-28 md:self-start md:px-0 md:pt-0">
+          <div className="glass-panel p-4 sm:p-6 md:p-7 lg:p-9">
+            {artwork.medium && (
+              <div className="mb-3 flex items-center justify-between gap-3 md:mb-5 md:gap-5">
+                <p className="eyebrow">{artwork.medium}</p>
+                <Sparkles className="h-4 w-4 shrink-0 text-primary" strokeWidth={1} />
+              </div>
+            )}
+            <h1 className="text-3xl leading-[1.1] [overflow-wrap:anywhere] sm:text-4xl md:text-5xl md:leading-[.98] lg:text-6xl">{artwork.title}</h1>
+            {details && details.ribbons.length > 0 && (
+              <ul className="mt-4 flex flex-wrap gap-2" aria-label="Product ribbons">
+                {details.ribbons.map((ribbon) => (
+                  <li key={ribbon} className="rounded-full border border-primary/40 px-3 py-1 text-xs text-accent">{ribbon}</li>
+                ))}
+              </ul>
+            )}
+            <div className="mt-3 flex flex-wrap items-center justify-between gap-3 border-b border-border pb-4 md:mt-5 md:pb-6">
+              <div>
+                <p className="flex flex-wrap items-baseline gap-3">
+                  <span className="text-base text-accent md:text-lg">{price}</span>
+                  {artwork.compareAtPrice != null && (
+                    <s className="text-sm text-muted-foreground">
+                      <span className="sr-only">Original price </span>
+                      {formatPrice({ price: artwork.compareAtPrice, currency: artwork.currency })}
+                    </s>
+                  )}
+                </p>
+                {details?.unitPrice && <p className="mt-1 text-xs text-muted-foreground">{details.unitPrice}</p>}
+              </div>
+              {!details && <p className="text-[9px] uppercase tracking-[.18em] text-muted-foreground">{artwork.reference}</p>}
             </div>
-            <h1 className="mt-5 text-5xl leading-[.98] sm:text-6xl md:text-5xl lg:text-6xl">{artwork.title}</h1>
-            <div className="mt-5 flex flex-wrap items-center justify-between gap-3 border-b border-border pb-6">
-              <p className="text-sm text-accent">{formatPrice(artwork)}</p>
-              <p className="text-[9px] uppercase tracking-[.18em] text-muted-foreground">{artwork.reference}</p>
-            </div>
-            <CertificateStatement className="mt-6" />
-            <p className="mt-7 font-display text-2xl italic leading-snug">{artwork.intro}</p>
-            <p className="mt-5 text-sm leading-7 text-muted-foreground">{artwork.description}</p>
-            <div className="mt-8 border-t border-border pt-7">
-              <p className="eyebrow">The details</p>
-              <ul className="mt-5 space-y-3 text-xs leading-6 text-muted-foreground">{artwork.details.map((detail) => <li key={detail} className="flex gap-3"><span className="text-primary">—</span>{detail}</li>)}</ul>
-            </div>
-            <div className="mt-9"><AcquisitionButton artwork={artwork} /></div>
+            <CertificateStatement className="mt-4 gap-2 leading-5 tracking-[.1em] md:mt-6 md:gap-3 md:leading-6 md:tracking-[.15em]" />
+            {artwork.intro && <p className="mt-5 font-display text-lg italic leading-snug md:mt-7 md:text-2xl">{artwork.intro}</p>}
+            {artwork.description && <p className="mt-4 whitespace-pre-line text-sm leading-6 text-muted-foreground [overflow-wrap:anywhere] md:mt-5 md:leading-7">{artwork.description}</p>}
+            {details && <WixArtworkDetails details={details} categories={categories} />}
+            {artwork.details.length > 0 && (
+              <div className="mt-5 border-t border-border pt-4 md:mt-8 md:pt-7">
+                <p className="eyebrow">The details</p>
+                <ul className="mt-3 space-y-2 text-xs leading-5 text-muted-foreground md:mt-5 md:space-y-3 md:leading-6">{artwork.details.map((detail) => <li key={detail} className="flex gap-3"><span className="text-primary">—</span>{detail}</li>)}</ul>
+              </div>
+            )}
+            <div className="mt-6 md:mt-9"><AcquisitionButton artwork={artwork} /></div>
             <InquiryDialog artwork={artwork.title}>
               <button className="mt-5 flex w-full items-center justify-center gap-2 text-[10px] uppercase tracking-[.18em] text-primary hover:text-accent"><MessageCircle className="h-4 w-4" strokeWidth={1.2} /> Bespoke inquiry</button>
             </InquiryDialog>
-            <div className="mt-7 flex gap-3 border-t border-border pt-6 text-[10px] leading-5 text-muted-foreground"><ShieldCheck className="mt-0.5 h-4 w-4 shrink-0 text-primary" strokeWidth={1.1} /><p>One of a kind. Insured white-glove delivery is arranged and quoted privately.</p></div>
+            <div className="mt-5 flex gap-3 border-t border-border pt-4 text-xs leading-5 text-muted-foreground md:mt-7 md:pt-6"><ShieldCheck className="mt-0.5 h-4 w-4 shrink-0 text-primary" strokeWidth={1.1} /><p>One of a kind. Insured white-glove delivery is arranged and quoted privately.</p></div>
           </div>
         </aside>
       </div>
 
-      <div className="glass-strong fixed inset-x-3 bottom-3 z-30 flex items-center justify-between gap-3 p-3 pl-5 md:hidden">
-        <div className="min-w-0"><p className="truncate font-display text-lg">{artwork.title}</p><p className="mt-0.5 text-[10px] text-primary">{formatPrice(artwork)}</p></div>
+      <div className="glass-strong fixed inset-x-3 bottom-[max(.75rem,env(safe-area-inset-bottom))] z-30 flex items-center justify-between gap-2 p-2.5 pl-3 md:hidden">
+        <div className="min-w-0"><p className="truncate font-display text-base leading-tight">{artwork.title}</p><p className="mt-0.5 text-xs text-primary">{price}</p></div>
         <AcquisitionButton artwork={artwork} compact />
       </div>
     </div>

@@ -43,6 +43,7 @@ export function SiteHeader() {
             <Link
               key={item.to}
               to={item.to}
+              preload={item.to === "/shop" ? "intent" : false}
               className="text-[10px] uppercase tracking-[.2em] text-muted-foreground transition-colors hover:text-accent"
               activeProps={{ className: "text-accent" }}
               activeOptions={{ exact: item.to === "/" }}
@@ -88,6 +89,7 @@ export function SiteHeader() {
               <Link
                 key={item.to}
                 to={item.to}
+                preload={item.to === "/shop" ? "intent" : false}
                   onClick={() => setOpen(false)}
                 className="group flex items-center justify-between gap-3 border-b border-border py-3 sm:py-5"
               >

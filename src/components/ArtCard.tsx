@@ -8,13 +8,15 @@ export function ArtCard({ a, className, priority = false }: { a: Artwork; classN
   const { formatPrice } = useCurrency();
   return (
     <article className={cn("group min-w-0", className)}>
-      <Link to="/artwork/$slug" params={{ slug: a.slug }} className="block" aria-label={`View ${a.title}`}>
+      <Link to="/artwork/$slug" params={{ slug: a.slug }} preload="intent" className="block" aria-label={`View ${a.title}`}>
         <div className="art-frame glass-panel aspect-[4/5] p-2 sm:p-3">
           <div className="relative h-full w-full overflow-hidden">
             <img
               src={a.images[0]?.src}
               alt={a.images[0]?.alt}
               loading={priority ? "eager" : "lazy"}
+              decoding="async"
+              fetchPriority={priority ? "high" : undefined}
               className="h-full w-full object-cover"
             />
             {a.images[1] && (
@@ -23,6 +25,7 @@ export function ArtCard({ a, className, priority = false }: { a: Artwork; classN
                 alt=""
                 aria-hidden
                 loading="lazy"
+                decoding="async"
                 className="absolute inset-0 h-full w-full object-cover opacity-0 group-hover:opacity-100"
               />
             )}

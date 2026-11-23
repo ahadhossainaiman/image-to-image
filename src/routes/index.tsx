@@ -3,7 +3,7 @@ import { ArrowDown, ArrowRight, ArrowUpRight, Feather, Gem, Leaf, Sparkles } fro
 import { useLayoutEffect, useRef } from "react";
 import forestHero from "@/assets/enchanted-forest-hero.jpg";
 import angelDetail from "@/assets/angel-2.jpg";
-import { getArtworks, getCategories, getCollectorReviews } from "@/lib/wix";
+import { getLatestArtworks, getCategories, getCollectorReviews } from "@/lib/wix";
 import { ArtCard } from "@/components/ArtCard";
 import { InquiryDialog } from "@/components/InquiryDialog";
 import { CertificateStatement } from "@/components/CertificateStatement";
@@ -13,16 +13,12 @@ import { getPageHead } from "@/lib/seo";
 
 export const Route = createFileRoute("/")({
   loader: async () => {
-    const [allArtworks, allCategories, reviews] = await Promise.all([
-      getArtworks(),
+    const [selectedWorks, categories, reviews] = await Promise.all([
+      getLatestArtworks(),
       getCategories(),
       getCollectorReviews(),
     ]);
-    return {
-      selectedWorks: allArtworks.slice(0, 3),
-      categories: allCategories,
-      reviews,
-    };
+    return { selectedWorks, categories, reviews };
   },
   head: () => getPageHead("/"),
   component: Index,
@@ -125,7 +121,7 @@ function Index() {
               One-of-a-kind handmade creations, shaped slowly and finished with wonder. Each work is an invitation into a world that exists only once.
             </p>
             <div className="col-span-2 mt-5 flex flex-col gap-2.5 sm:mt-9 sm:flex-row sm:items-center sm:gap-4">
-              <Link to="/shop" className="btn-art justify-center">
+              <Link to="/shop" preload="intent" className="btn-art justify-center">
                 Explore the gallery <ArrowRight className="h-4 w-4" strokeWidth={1.2} />
               </Link>
               <InquiryDialog>
@@ -151,7 +147,7 @@ function Index() {
         </div>
         <div className="mt-6 grid gap-x-7 gap-y-6 md:mt-16 md:gap-y-12 sm:grid-cols-2 lg:grid-cols-3">
           {categories.map((category, index) => category.published ? (
-            <Link key={category.slug} to="/collections/$slug" params={{ slug: category.slug }} className="group block min-w-0">
+            <Link key={category.slug} to="/collections/$slug" params={{ slug: category.slug }} preload="intent" className="group block min-w-0">
               <div className="glass-panel art-frame aspect-[4/5] p-2 transition-transform duration-500 group-hover:-translate-y-2 group-hover:border-primary/60">
                 <div className="absolute inset-2 overflow-hidden sm:inset-3 bg-muted">
                   {category.image && <CollectionImage key={category.image} src={category.image} alt={category.name} />}
@@ -213,7 +209,7 @@ function Index() {
       <section className="mx-auto max-w-[1400px] px-4 pt-7 pb-5 sm:px-10 md:py-24 lg:pt-20 lg:pb-18">
         <div className="flex flex-col gap-3 border-b border-border pb-4 sm:gap-6 sm:pb-8 sm:flex-row sm:items-end sm:justify-between">
           <div><p className="eyebrow">Selected works</p><h2 className="mt-2 text-4xl sm:mt-4 sm:text-6xl">From the atelier</h2><CertificateStatement className="mt-3 max-w-xl sm:mt-5" /></div>
-          <Link to="/shop" className="flex w-fit items-center gap-3 text-[10px] uppercase tracking-[.2em] text-primary hover:text-accent">View all works <ArrowUpRight className="h-4 w-4" /></Link>
+          <Link to="/shop" preload="intent" className="flex w-fit items-center gap-3 text-[10px] uppercase tracking-[.2em] text-primary hover:text-accent">View all works <ArrowUpRight className="h-4 w-4" /></Link>
         </div>
         <div className="mt-5 grid gap-x-10 gap-y-6 md:mt-14 md:gap-y-16 md:grid-cols-2">
           {selectedWorks.map((artwork, index) => <ArtCard key={artwork.slug} a={artwork} className={index === 1 ? "md:mt-24" : ""} />)}
