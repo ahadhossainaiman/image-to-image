@@ -1,32 +1,42 @@
 import { Link } from "@tanstack/react-router";
 import { ArrowUpRight } from "lucide-react";
+import { useState } from "react";
 import type { Artwork } from "@/data/catalog";
 import { useCurrency } from "@/lib/currency";
 import { cn } from "@/lib/utils";
 
 export function ArtCard({ a, className, priority = false }: { a: Artwork; className?: string; priority?: boolean }) {
   const { formatPrice } = useCurrency();
+  const cover = a.images[0];
+  const preview = a.images.find((image) => image.src && image.src !== cover?.src);
+  const [loadedPreview, setLoadedPreview] = useState<string>();
+
   return (
     <article className={cn("group min-w-0", className)}>
       <Link to="/artwork/$slug" params={{ slug: a.slug }} preload="intent" className="block" aria-label={`View ${a.title}`}>
         <div className="art-frame glass-panel aspect-[4/5] p-2 sm:p-3">
           <div className="relative h-full w-full overflow-hidden">
             <img
-              src={a.images[0]?.src}
-              alt={a.images[0]?.alt}
+              src={cover?.src}
+              alt={cover?.alt}
               loading={priority ? "eager" : "lazy"}
               decoding="async"
               fetchPriority={priority ? "high" : undefined}
               className="h-full w-full object-cover"
             />
-            {a.images[1] && (
+            {preview && (
               <img
-                src={a.images[1].src}
+                key={preview.src}
+                src={preview.src}
                 alt=""
                 aria-hidden
                 loading="lazy"
                 decoding="async"
-                className="absolute inset-0 h-full w-full object-cover opacity-0 group-hover:opacity-100"
+                onLoad={() => setLoadedPreview(preview.src)}
+                className={cn(
+                  "absolute inset-0 h-full w-full object-cover opacity-0",
+                  loadedPreview === preview.src && "group-hover:opacity-100",
+                )}
               />
             )}
             <div className="absolute inset-x-0 bottom-0 h-1/3 bg-gradient-to-t from-background/55 to-transparent" />

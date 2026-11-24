@@ -29,9 +29,10 @@ export function CatalogLoading({ page }: { page: "shop" | "collection" | "artwor
         <Skeleton className="mt-5 h-12 w-4/5 max-w-2xl md:h-20" />
         <Skeleton className="mt-5 h-4 w-3/4 max-w-lg" />
         {page === "shop" && <Skeleton className="mt-5 h-28 w-full md:mt-10" />}
-        <div className="mt-7 grid gap-x-10 gap-y-6 md:mt-12 md:grid-cols-2">
+        <div className="mt-7 grid gap-x-10 gap-y-6 md:mt-12 md:grid-cols-2 lg:grid-cols-3">
           <Skeleton className="aspect-[4/5] w-full" />
           <Skeleton className="hidden aspect-[4/5] w-full md:block" />
+          <Skeleton className="hidden aspect-[4/5] w-full lg:block" />
         </div>
       </div>
     </div>

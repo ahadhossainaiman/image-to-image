@@ -10,6 +10,19 @@ import {
   type Category,
 } from "@/data/catalog";
 
+const collectionOrder = new Map([
+  ["the queen collection", 0],
+  ["the queen's court", 1],
+  ["the queen's kingdom", 2],
+  ["the mushroom woodland", 3],
+  ["the mushroom woodlands", 3],
+]);
+
+function collectionRank(category: Category): number {
+  const name = category.shortName.toLowerCase().replace(/’/g, "'");
+  return collectionOrder.get(name) ?? collectionOrder.size;
+}
+
 type WixQueryPage<T> = {
   items: T[];
   hasNext: () => boolean;
@@ -50,17 +63,23 @@ export async function getArtworks(): Promise<Artwork[]> {
   }
 }
 
-/** Fetches the two newest public artworks for the homepage. */
+/** Fetches the three newest public artworks for the homepage. */
 export async function getLatestArtworks(): Promise<Artwork[]> {
-  const limit = 2;
+  const limit = 3;
   if (isWixConfigured()) {
     try {
       // Wix assigns increasing numeric IDs as products are created.
-      const { items } = await wixClient.products.queryProducts().descending("numericId").limit(limit).find();
-      return items
-        .filter((item) => item && item.visible !== false)
-        .slice(0, limit)
-        .map(mapWixProductToArtwork);
+      let page = await wixClient.products.queryProducts().descending("numericId").limit(limit).find();
+      const latest: Artwork[] = [];
+      while (true) {
+        const published = page.items
+          .filter((item) => item && item.visible !== false)
+          .slice(0, limit - latest.length)
+          .map(mapWixProductToArtwork);
+        latest.push(...published);
+        if (latest.length === limit || !page.hasNext()) return latest;
+        page = await page.next();
+      }
     } catch (error) {
       console.warn("Wix Headless: Failed to query the latest products, falling back to local catalog:", error);
     }
@@ -113,7 +132,8 @@ export async function getCategories(): Promise<Category[]> {
       return items
         .filter((item): item is NonNullable<typeof item> => Boolean(item))
         .map(mapWixCollectionToCategory)
-        .filter((c) => c.published);
+        .filter((c) => c.published)
+        .sort((a, b) => collectionRank(a) - collectionRank(b));
     }
     return localCategories();
   } catch (error) {

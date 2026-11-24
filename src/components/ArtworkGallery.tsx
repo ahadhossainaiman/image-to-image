@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
-import { Play } from "lucide-react";
+import { Maximize2, Play } from "lucide-react";
+import { Dialog, DialogContent, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import type { ArtworkMedia } from "@/data/catalog";
 
 const mediaClassName = "absolute inset-0 h-full w-full object-contain";
@@ -55,14 +56,35 @@ export function ArtworkGallery({ items }: { items: ArtworkMedia[] }) {
               {item.kind === "video" ? (
                 <video src={item.src} poster={item.poster} aria-label={item.alt} controls playsInline preload="none" className={mediaClassName} />
               ) : (
-                <img
-                  src={item.src}
-                  alt={item.alt}
-                  loading={index === 0 ? "eager" : "lazy"}
-                  fetchPriority={index === 0 ? "high" : undefined}
-                  decoding="async"
-                  className={mediaClassName}
-                />
+                <Dialog>
+                  <DialogTrigger asChild>
+                    <button
+                      type="button"
+                      aria-label={`View full image: ${item.name || item.alt}`}
+                      className="absolute inset-0 cursor-zoom-in focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-primary"
+                    >
+                      <img
+                        src={item.src}
+                        alt={item.alt}
+                        loading={index === 0 ? "eager" : "lazy"}
+                        fetchPriority={index === 0 ? "high" : undefined}
+                        decoding="async"
+                        draggable={false}
+                        className={mediaClassName}
+                      />
+                      <span className="absolute bottom-2 right-2 grid size-8 place-items-center rounded-full bg-background/85 text-foreground">
+                        <Maximize2 className="size-4" aria-hidden="true" />
+                      </span>
+                    </button>
+                  </DialogTrigger>
+                  <DialogContent
+                    aria-describedby={undefined}
+                    className="w-[calc(100%_-_1rem)] max-w-7xl gap-0 p-2 pt-14 sm:p-4 sm:pt-16 [&>button]:right-2 [&>button]:top-2 [&>button]:grid [&>button]:size-11 [&>button]:place-items-center"
+                  >
+                    <DialogTitle className="sr-only">{item.name || item.alt}</DialogTitle>
+                    <img src={item.src} alt={item.alt} className="h-[calc(100dvh_-_5.25rem)] w-full object-contain sm:h-[calc(100dvh_-_7rem)]" />
+                  </DialogContent>
+                </Dialog>
               )}
             </div>
             {item.name && (

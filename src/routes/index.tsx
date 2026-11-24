@@ -4,7 +4,7 @@ import { useLayoutEffect, useRef } from "react";
 import forestHero from "@/assets/enchanted-forest-hero.jpg";
 import angelDetail from "@/assets/angel-2.jpg";
 import { getLatestArtworks, getCategories, getCollectorReviews } from "@/lib/wix";
-import { ArtCard } from "@/components/ArtCard";
+import { ArtCardGrid } from "@/components/ArtCardGrid";
 import { InquiryDialog } from "@/components/InquiryDialog";
 import { CertificateStatement } from "@/components/CertificateStatement";
 import { CollectorReviewsSection } from "@/components/CollectorReviewsSection";
@@ -145,7 +145,7 @@ function Index() {
           <h2 className="mt-3 text-4xl leading-[1.02] sm:mt-6 sm:text-6xl">Step into our <em className="text-accent">enchanted worlds</em></h2>
           <p className="mx-auto mt-3 max-w-xl text-sm leading-relaxed sm:mt-6 sm:leading-7 text-muted-foreground">From celestial couture to embroidered woodland forms, every collection begins with a story and ends with an object unlike any other.</p>
         </div>
-        <div className="mt-6 grid gap-x-7 gap-y-6 md:mt-16 md:gap-y-12 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="mt-6 grid gap-x-7 gap-y-6 md:mt-16 md:gap-y-12 sm:grid-cols-2 lg:mx-auto lg:w-[90%] lg:grid-cols-3">
           {categories.map((category, index) => category.published ? (
             <Link key={category.slug} to="/collections/$slug" params={{ slug: category.slug }} preload="intent" className="group block min-w-0">
               <div className="glass-panel art-frame aspect-[4/5] p-2 transition-transform duration-500 group-hover:-translate-y-2 group-hover:border-primary/60">
@@ -153,9 +153,11 @@ function Index() {
                   {category.image && <CollectionImage key={category.image} src={category.image} alt={category.name} />}
                   <div className="absolute inset-0 bg-gradient-to-t from-background/85 via-transparent to-transparent" />
                   <span className="absolute left-3 top-3 sm:left-5 sm:top-5 text-[9px] tracking-[.25em] text-accent">0{index + 1}</span>
-                  <div className="absolute inset-x-3 bottom-3 flex items-end justify-between gap-2 sm:inset-x-5 sm:bottom-5 sm:gap-4">
-                    <h3 className="min-w-0 max-w-xs text-2xl leading-[1.05] [overflow-wrap:anywhere] sm:text-3xl">{category.shortName}</h3>
-                    <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-primary/40 bg-background/25 backdrop-blur-md transition-colors group-hover:bg-primary group-hover:text-primary-foreground"><ArrowUpRight className="h-4 w-4" strokeWidth={1.1} /></span>
+                  <div className="absolute inset-x-3 bottom-3 flex items-center gap-2 sm:inset-x-4 sm:bottom-5">
+                    <div className="@container min-w-0 flex-1">
+                      <h3 className="truncate text-[clamp(.75rem,8cqw,1.875rem)] leading-tight">{category.shortName}</h3>
+                    </div>
+                    <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-primary/40 bg-background/25 backdrop-blur-md transition-colors group-hover:bg-primary group-hover:text-primary-foreground xl:h-10 xl:w-10"><ArrowUpRight className="h-4 w-4" strokeWidth={1.1} /></span>
                   </div>
                 </div>
               </div>
@@ -211,9 +213,7 @@ function Index() {
           <div><p className="eyebrow">Selected works</p><h2 className="mt-2 text-4xl sm:mt-4 sm:text-6xl">From the atelier</h2><CertificateStatement className="mt-3 max-w-xl sm:mt-5" /></div>
           <Link to="/shop" preload="intent" className="flex w-fit items-center gap-3 text-[10px] uppercase tracking-[.2em] text-primary hover:text-accent">View all works <ArrowUpRight className="h-4 w-4" /></Link>
         </div>
-        <div className="mt-5 grid gap-x-10 gap-y-6 md:mt-14 md:gap-y-16 md:grid-cols-2">
-          {selectedWorks.map((artwork, index) => <ArtCard key={artwork.slug} a={artwork} className={index === 1 ? "md:mt-24" : ""} />)}
-        </div>
+        <ArtCardGrid artworks={selectedWorks} />
       </section>
 
       {/* Collector Reflections & Reviews */}
