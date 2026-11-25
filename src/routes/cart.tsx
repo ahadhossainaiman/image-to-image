@@ -2,8 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState } from "react";
 import { ArrowLeft, ArrowRight, BadgeCheck, ShieldCheck, X } from "lucide-react";
 import { useCartDetails, removeFromCart } from "@/lib/cart";
-import { getArtwork } from "@/data/catalog";
-import { convertAmount, useCurrency } from "@/lib/currency";
+import { formatPrice, storeCurrency, usdPrice } from "@/lib/currency";
 import { isWixConfigured, redirectToWixCheckout } from "@/lib/wix";
 
 export const Route = createFileRoute("/cart")({
@@ -21,12 +20,11 @@ export const Route = createFileRoute("/cart")({
 
 function Cart() {
   const items = useCartDetails();
-  const { currency } = useCurrency();
   const [isCheckingOut, setIsCheckingOut] = useState(false);
   const [checkoutError, setCheckoutError] = useState<string | null>(null);
 
-  const allPriced = items.length > 0 && items.every((i) => i.price != null);
-  const subtotal = allPriced ? items.reduce((sum, i) => sum + (i.price ?? 0), 0) : null;
+  const allPriced = items.length > 0 && items.every((item) => usdPrice(item) != null);
+  const subtotal = allPriced ? items.reduce((sum, item) => sum + (usdPrice(item) ?? 0), 0) : null;
 
   async function handleCheckout() {
     setIsCheckingOut(true);
@@ -53,13 +51,13 @@ function Cart() {
                   {item.image ? (
                     <img src={item.image} alt={item.title} className="aspect-[4/5] w-full object-cover" />
                   ) : (
-                    <div className="aspect-[4/5] w-full flex items-center justify-center text-xs text-muted-foreground">Artwork</div>
+                    <div className="aspect-[4/5] w-full" />
                   )}
                 </Link>
                 <div className="flex min-w-0 flex-1 flex-col py-1">
-                  <p className="eyebrow text-[8px]">{item.reference}</p>
-                  <Link to="/artwork/$slug" params={{ slug: item.slug }} className="mt-2 font-display text-3xl leading-tight hover:text-accent sm:text-4xl">{item.title}</Link>
-                  <p className="mt-3 text-xs text-muted-foreground">{item.formattedPrice}</p>
+                  {item.reference && <p className="eyebrow [overflow-wrap:anywhere]">{item.reference}</p>}
+                  {item.title && <Link to="/artwork/$slug" params={{ slug: item.slug }} className="mt-2 font-display text-3xl leading-tight hover:text-accent sm:text-4xl">{item.title}</Link>}
+                  {item.formattedPrice && <p className="mt-3 text-xs text-muted-foreground">{item.formattedPrice}</p>}
                   <button onClick={() => removeFromCart(item.slug)} className="mt-auto flex w-fit items-center gap-2 text-[9px] uppercase tracking-[.16em] text-muted-foreground hover:text-foreground"><X className="h-3 w-3" /> Remove</button>
                 </div>
               </li>
@@ -68,7 +66,7 @@ function Cart() {
           <aside className="glass-panel h-fit p-7 lg:sticky lg:top-28">
             <p className="eyebrow">Acquisition summary</p>
             <div className="mt-6 flex items-center justify-between border-b border-border pb-5"><span className="text-sm text-muted-foreground">Selected works</span><span className="font-display text-2xl">{items.length}</span></div>
-            <div className="mt-5 flex items-center justify-between border-b border-border pb-5"><span className="text-sm text-muted-foreground">Subtotal {subtotal != null && `(${currency})`}</span><span className="text-sm text-accent">{subtotal != null ? new Intl.NumberFormat("en-US", { style: "currency", currency, maximumFractionDigits: 0 }).format(subtotal) : "On request"}</span></div>
+            {subtotal != null && <div className="mt-5 flex items-center justify-between border-b border-border pb-5"><span className="text-sm text-muted-foreground">Subtotal ({storeCurrency})</span><span className="text-sm text-accent">{formatPrice({ price: subtotal, currency: storeCurrency })}</span></div>}
             <div className="mt-6 space-y-4 text-xs leading-6 text-muted-foreground"><p className="flex gap-3"><ShieldCheck className="mt-1 h-4 w-4 shrink-0 text-primary" strokeWidth={1.1} />White-glove insured delivery quoted for your destination.</p><p className="flex gap-3"><BadgeCheck className="mt-1 h-4 w-4 shrink-0 text-primary" strokeWidth={1.1} />Certificate of Authenticity with each final acquisition.</p></div>
 
             {checkoutError && (

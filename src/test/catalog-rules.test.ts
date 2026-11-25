@@ -1,17 +1,17 @@
 import { describe, expect, it } from "vitest";
-import { publicCategories } from "@/data/catalog";
-import { formatInCurrency } from "@/lib/currency";
+import { formatPrice } from "@/lib/currency";
 
 describe("gallery rules", () => {
-  it("hides unpublished category placeholders from public listings", () => {
-    expect(publicCategories().map((category) => category.slug)).toEqual(["haute-artistry", "merino-mushrooms"]);
+  it("formats the actual USD amount with its fractional price", () => {
+    expect(formatPrice({ price: 100.75, currency: "USD" })).toBe("$100.75");
   });
 
-  it("converts a displayed USD price into GBP", () => {
-    expect(formatInCurrency({ price: 100, currency: "USD" }, "GBP")).toBe("£79");
+  it("does not display a non-USD amount as a US dollar price", () => {
+    expect(formatPrice({ price: 280, currency: "BDT" })).toBe("");
   });
 
-  it("keeps unpriced works on request in every display currency", () => {
-    expect(formatInCurrency({ price: null, currency: "USD" }, "EUR")).toBe("Price on request");
+  it("omits a price when Wix did not send an amount or currency", () => {
+    expect(formatPrice({ price: null, currency: "USD" })).toBe("");
+    expect(formatPrice({ price: 280 })).toBe("");
   });
 });

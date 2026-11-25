@@ -25,12 +25,25 @@ npm run dev
 
 Set `VITE_SITE_URL` to the site's canonical public origin before running
 `npm run build`. The build writes page-specific HTML, `robots.txt`, and
-`sitemap.xml` to `dist/`.
+`sitemap.xml` to `dist/`. With `VITE_WIX_CLIENT_ID` configured and Wix reachable at
+build time, the sitemap also includes public product and collection URLs.
 
 Serve `index.html` for `/` and resolve the five public URLs and `/cart` to
 their matching HTML files before applying an SPA rewrite. Use `spa.html`
 for client-rendered routes such as individual artwork and collection pages.
 `npm run preview` uses this routing locally.
+
+The Google Search Console and Bing Webmaster Tools verification tags live in
+`index.html` and are included in every generated HTML page. After deployment,
+verify ownership with the respective accounts and submit `/sitemap.xml`.
+
+Set `VITE_GTM_CONTAINER_ID` to the production web container ID. Set
+`VITE_META_PIXEL_ID` to the production Pixel ID for direct PageView tracking, or
+leave it blank if the same Pixel is configured in the GTM container. Use the GTM
+history-change trigger for client-side navigation if tracking route changes in GTM.
+
+The storefront displays prices received in USD from Wix. Configure USD and the
+approved product amounts in Wix before enabling USD checkout in production.
 
 ## Built with
 

@@ -180,7 +180,7 @@ export function CollectorReviewsSection({ reviews }: CollectorReviewsSectionProp
                     <div className="relative z-10 flex flex-1 flex-col">
                       {/* Stars and Verified Badge */}
                       <div className="flex flex-wrap items-center justify-between gap-x-3 gap-y-2 border-b border-border/40 pb-3 md:pb-4">
-                        <div
+                        {review.stars != null && <div
                           className="flex items-center gap-1.5 text-accent"
                           aria-label={`${review.stars} out of 5 stars`}
                         >
@@ -193,7 +193,7 @@ export function CollectorReviewsSection({ reviews }: CollectorReviewsSectionProp
                               ★
                             </span>
                           ))}
-                        </div>
+                        </div>}
                         <span className="flex items-center gap-1.5 text-[8px] uppercase tracking-[.24em] text-muted-foreground/80">
                           <Heart
                             className="h-2.5 w-2.5 text-primary/80 transition-colors group-hover:text-primary"
@@ -204,9 +204,9 @@ export function CollectorReviewsSection({ reviews }: CollectorReviewsSectionProp
                       </div>
 
                       {/* Card Title */}
-                      <h3 className="mt-3 font-display text-2xl font-normal leading-snug text-foreground transition-colors duration-300 group-hover:text-accent md:mt-6 md:text-[1.65rem]">
+                      {review.title && <h3 className="mt-3 font-display text-2xl font-normal leading-snug text-foreground transition-colors duration-300 group-hover:text-accent md:mt-6 md:text-[1.65rem]">
                         {review.title}
-                      </h3>
+                      </h3>}
 
                       {/* Review Quote */}
                       <p className="mt-2 font-display text-[0.98rem] italic leading-relaxed whitespace-pre-line text-foreground/85 transition-colors duration-300 group-hover:text-foreground md:mt-4 md:flex-1">

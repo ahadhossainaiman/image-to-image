@@ -9,7 +9,7 @@ export function WixArtworkDetails({ details, categories }: Props) {
   const attributes = [
     { label: "Collection", value: categories.map((category) => category.name).join(", ") },
     { label: "Brand", value: details.brand },
-    { label: "SKU", value: details.sku },
+    { label: "Item number", value: details.sku },
     { label: "Dimensions", value: details.dimensions },
     { label: "Availability", value: details.stockLabel },
   ].filter(({ value }) => value);

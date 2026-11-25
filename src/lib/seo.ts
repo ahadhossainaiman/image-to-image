@@ -1,4 +1,4 @@
-export const defaultSiteUrl = "https://image.algorithmalliance.com";
+export const defaultSiteUrl = "https://thyhouseofart.com";
 const siteName = "Thy House Of Art";
 
 export const seoPages = {
@@ -39,6 +39,10 @@ export function getSiteOrigin(value?: string) {
     throw new Error("VITE_SITE_URL must be an absolute HTTP(S) origin.");
   }
   return url.origin;
+}
+
+export function catalogCanonical(path: "/artwork" | "/collections", slug: string) {
+  return new URL(`${path}/${encodeURIComponent(slug)}`, getSiteOrigin(import.meta.env["VITE_SITE_URL"])).href;
 }
 
 export function buildPageHead(path: SeoPath, origin: string) {

@@ -1,5 +1,6 @@
 import type { Plugin } from "vite";
 import { buildPageHead, seoPaths, type SeoPath } from "../src/lib/seo";
+import { getWixSitemapPaths } from "./wix-sitemap";
 
 const headMarker = "<!-- page-seo -->";
 const staticTag = "data-static-seo";
@@ -22,14 +23,17 @@ function pageMarkup(path: SeoPath, origin: string) {
   ].join("\n    ");
 }
 
-export function seoBuild(origin: string): Plugin {
-  const sitemap = [
+function makeSitemap(origin: string, paths: readonly string[]) {
+  return [
     '<?xml version="1.0" encoding="UTF-8"?>',
     '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">',
-    ...seoPaths.map((path) => `  <url><loc>${escapeMarkup(new URL(path, origin).href)}</loc></url>`),
+    ...[...new Set(paths)].sort().map((path) => `  <url><loc>${escapeMarkup(new URL(path, origin).href)}</loc></url>`),
     "</urlset>",
     "",
   ].join("\n");
+}
+
+export function seoBuild(origin: string, wixClientId?: string): Plugin {
   const robots = `User-agent: *\nAllow: /\n\nSitemap: ${new URL("/sitemap.xml", origin).href}\n`;
 
   return {
@@ -40,7 +44,7 @@ export function seoBuild(origin: string): Plugin {
         if (path === "/robots.txt" || path === "/sitemap.xml") {
           const isSitemap = path === "/sitemap.xml";
           response.setHeader("Content-Type", isSitemap ? "application/xml; charset=utf-8" : "text/plain; charset=utf-8");
-          response.end(isSitemap ? sitemap : robots);
+          response.end(isSitemap ? makeSitemap(origin, seoPaths) : robots);
           return;
         }
         next();
@@ -61,14 +65,16 @@ export function seoBuild(origin: string): Plugin {
       });
     },
     transformIndexHtml(html, { server, originalUrl }) {
-      if (!server || !originalUrl) return html;
-      const pathname = new URL(originalUrl, origin).pathname.replace(/\/$/, "") || "/";
-      const path = seoPaths.find((entry) => entry === pathname);
-      return html.replace(headMarker, path ? pageMarkup(path, origin) : fallbackHead);
+      if (server && originalUrl) {
+        const pathname = new URL(originalUrl, origin).pathname.replace(/\/$/, "") || "/";
+        const path = seoPaths.find((entry) => entry === pathname);
+        return html.replace(headMarker, path ? pageMarkup(path, origin) : fallbackHead);
+      }
+      return html;
     },
     generateBundle: {
       order: "post",
-      handler(_options, bundle) {
+      async handler(_options, bundle) {
         const index = bundle["index.html"];
         if (index?.type !== "asset" || typeof index.source !== "string" || !index.source.includes(headMarker)) {
           this.error("The HTML build is missing the SEO head marker.");
@@ -87,7 +93,8 @@ export function seoBuild(origin: string): Plugin {
           source: template.replace(headMarker, `${fallbackHead}\n    <meta ${staticTag} name="robots" content="noindex">`),
         });
         this.emitFile({ type: "asset", fileName: "robots.txt", source: robots });
-        this.emitFile({ type: "asset", fileName: "sitemap.xml", source: sitemap });
+        const catalogPaths = await getWixSitemapPaths(wixClientId);
+        this.emitFile({ type: "asset", fileName: "sitemap.xml", source: makeSitemap(origin, [...seoPaths, ...catalogPaths]) });
       },
     },
   };

@@ -34,7 +34,6 @@ export type Artwork = {
   medium: string;
   availability: "available" | "acquired";
   price: number | null;
-  compareAtPrice?: number;
   currency: string;
   intro: string;
   description: string;

@@ -76,7 +76,8 @@ function mapProductMedia(item: products.MediaItem, title: string): ArtworkMedia 
 
 /** Maps a Wix Stores Product to the atelier's public artwork details. */
 export function mapWixProductToArtwork(p: products.Product): Artwork {
-  const title = p.name?.trim() || "Untitled Artwork";
+  const slug = p.slug || p._id || "";
+  const title = p.name?.trim() ?? "";
   const gallery = (p.media?.items ?? [])
     .map((item) => mapProductMedia(item, title))
     .filter((item): item is ArtworkMedia => Boolean(item));
@@ -101,8 +102,8 @@ export function mapWixProductToArtwork(p: products.Product): Artwork {
     PARTIALLY_OUT_OF_STOCK: "Some options out of stock",
   };
   const priceData = p.priceData ?? p.price;
-  const price = priceData?.discountedPrice ?? priceData?.price ?? null;
-  const originalPrice = priceData?.price;
+  const price = priceData?.price ?? null;
+  const currency = priceData?.currency?.trim().toUpperCase() ?? "";
   const sku = p.sku?.trim() ?? "";
   const dimensions = p.productDimensions;
   const unit = dimensions?.unit && dimensions.unit !== "UNKNOWN_DIMENSIONS_UNIT" ? dimensions.unit.toLowerCase() : "";
@@ -113,16 +114,15 @@ export function mapWixProductToArtwork(p: products.Product): Artwork {
   ].filter(({ value }) => value);
 
   return {
-    slug: p.slug || p._id || "",
+    slug,
     title,
-    reference: sku || `THOA-${(p._id || "").slice(0, 6).toUpperCase()}`,
-    category: p.collectionIds?.[0] || "haute-artistry",
+    reference: sku,
+    category: p.collectionIds?.[0] ?? "",
     wixCollectionIds: p.collectionIds ?? [],
     medium: mediumSection?.text ?? "",
     availability: stockStatus === "OUT_OF_STOCK" ? "acquired" : "available",
     price,
-    ...(originalPrice != null && price != null && originalPrice > price && { compareAtPrice: originalPrice }),
-    currency: priceData?.currency || "USD",
+    currency,
     intro: "",
     description: productText(p.description),
     details: [],
@@ -135,7 +135,7 @@ export function mapWixProductToArtwork(p: products.Product): Artwork {
         .filter((ribbon): ribbon is string => Boolean(ribbon)),
       stockLabel: stockStatus ? stockLabels[stockStatus] : "",
       dimensions: measurements.map(({ label, value }) => [label, value, unit].filter(Boolean).join(" ")).join(" × "),
-      unitPrice: priceData?.formatted?.pricePerUnit?.trim() ?? "",
+      unitPrice: currency === "USD" ? priceData?.formatted?.pricePerUnit?.trim() ?? "" : "",
       sections: sections.filter((section) => section !== mediumSection),
       options: (p.productOptions ?? []).map((option) => ({
         name: option.name?.trim() ?? "",
@@ -146,7 +146,7 @@ export function mapWixProductToArtwork(p: products.Product): Artwork {
       })).filter((option) => option.name && option.choices.length),
       customizationLabels: (p.customTextFields ?? []).map((field) => field.title?.trim() || "").filter(Boolean),
     },
-    published: p.visible ?? true,
+    published: p.visible !== false && Boolean(slug && title),
   };
 }
 
@@ -154,13 +154,15 @@ export function mapWixProductToArtwork(p: products.Product): Artwork {
  * Maps a Wix Stores Collection entity to the atelier's Category interface.
  */
 export function mapWixCollectionToCategory(c: collections.Collection): Category {
+  const slug = c.slug || c._id || "";
   const imageUrl = formatWixImageUrl(c.media?.mainMedia?.image?.url);
+  const name = c.name?.trim().replace(/^The Mushroom Woodlands(?=\s*(?:[—–-]|$))/i, "The Mushroom Woodland") ?? "";
   const result: Category = {
-    slug: c.slug || c._id || "",
-    name: c.name || "Collection",
-    shortName: c.name?.split("—")[0]?.trim() || c.name || "Collection",
-    description: (c.description || "").replace(/<[^>]+>/g, " ").trim() || "Singular works from the atelier.",
-    published: c.visible ?? true,
+    slug,
+    name,
+    shortName: name.split("—")[0]?.trim() || name,
+    description: productText(c.description),
+    published: c.visible !== false && Boolean(slug && name),
   };
 
   if (imageUrl) {

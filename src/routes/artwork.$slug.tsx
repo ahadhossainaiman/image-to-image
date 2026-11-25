@@ -4,12 +4,12 @@ import { ArrowLeft, ChevronRight, MessageCircle, ShieldCheck, ShoppingBag, Spark
 import { getArtworkBySlug, getCategoryBySlugOrId } from "@/lib/wix";
 import type { Artwork, Category } from "@/data/catalog";
 import { addToCart, useCart } from "@/lib/cart";
-import { useCurrency } from "@/lib/currency";
-import { InquiryDialog } from "@/components/InquiryDialog";
+import { formatPrice, usdPrice } from "@/lib/currency";
 import { CertificateStatement } from "@/components/CertificateStatement";
 import { ArtworkGallery } from "@/components/ArtworkGallery";
 import { WixArtworkDetails } from "@/components/WixArtworkDetails";
 import { CatalogLoading } from "@/components/CatalogLoading";
+import { catalogCanonical } from "@/lib/seo";
 
 export const Route = createFileRoute("/artwork/$slug")({
   pendingComponent: () => <CatalogLoading page="artwork" />,
@@ -29,11 +29,12 @@ export const Route = createFileRoute("/artwork/$slug")({
     };
   },
   head: ({ loaderData }) => loaderData?.artwork ? {
+    links: [{ rel: "canonical", href: catalogCanonical("/artwork", loaderData.artwork.slug) }],
     meta: [
       { title: `${loaderData.artwork.title} — Thy House Of Art` },
-      { name: "description", content: loaderData.artwork.description || loaderData.artwork.intro || loaderData.artwork.title },
+      ...(loaderData.artwork.description ? [{ name: "description", content: loaderData.artwork.description }] : []),
       { property: "og:title", content: `${loaderData.artwork.title} — Thy House Of Art` },
-      { property: "og:description", content: loaderData.artwork.description || loaderData.artwork.intro || loaderData.artwork.title },
+      ...(loaderData.artwork.description ? [{ property: "og:description", content: loaderData.artwork.description }] : []),
       { property: "og:type", content: "product" },
       { name: "twitter:card", content: "summary_large_image" },
     ],
@@ -65,13 +66,15 @@ function AcquisitionButton({ artwork, compact = false }: { artwork: Artwork; com
     setIsAdding(false);
   }
 
-  if (artwork.price == null) {
+  if (usdPrice(artwork) == null) {
     return (
-      <InquiryDialog artwork={artwork.title}>
-        <button className={compact ? "btn-art min-h-11 shrink-0 gap-2 px-3 py-2 tracking-[.12em]" : "btn-art w-full"}>
-          Acquire artwork <ChevronRight className="h-4 w-4" />
-        </button>
-      </InquiryDialog>
+      <Link
+        to="/contact"
+        search={{ piece: artwork.title }}
+        className={compact ? "btn-art min-h-11 shrink-0 gap-2 px-3 py-2 tracking-[.12em]" : "btn-art w-full"}
+      >
+        Acquire artwork <ChevronRight className="h-4 w-4" />
+      </Link>
     );
   }
   return (
@@ -88,7 +91,6 @@ function AcquisitionButton({ artwork, compact = false }: { artwork: Artwork; com
 
 function ArtworkPage() {
   const { artwork, categories } = Route.useLoaderData();
-  const { formatPrice } = useCurrency();
   const category = categories[0];
   const details = artwork.wixDetails;
   const price = formatPrice(artwork);
@@ -125,21 +127,12 @@ function ArtworkPage() {
                 ))}
               </ul>
             )}
-            <div className="mt-3 flex flex-wrap items-center justify-between gap-3 border-b border-border pb-4 md:mt-5 md:pb-6">
-              <div>
-                <p className="flex flex-wrap items-baseline gap-3">
-                  <span className="text-base text-accent md:text-lg">{price}</span>
-                  {artwork.compareAtPrice != null && (
-                    <s className="text-sm text-muted-foreground">
-                      <span className="sr-only">Original price </span>
-                      {formatPrice({ price: artwork.compareAtPrice, currency: artwork.currency })}
-                    </s>
-                  )}
-                </p>
+            {price && (
+              <div className="mt-3 border-b border-border pb-4 md:mt-5 md:pb-6">
+                <p className="text-base text-accent md:text-lg">{price}</p>
                 {details?.unitPrice && <p className="mt-1 text-xs text-muted-foreground">{details.unitPrice}</p>}
               </div>
-              {!details && <p className="text-[9px] uppercase tracking-[.18em] text-muted-foreground">{artwork.reference}</p>}
-            </div>
+            )}
             <CertificateStatement className="mt-4 gap-2 leading-5 tracking-[.1em] md:mt-6 md:gap-3 md:leading-6 md:tracking-[.15em]" />
             {artwork.intro && <p className="mt-5 font-display text-lg italic leading-snug md:mt-7 md:text-2xl">{artwork.intro}</p>}
             {artwork.description && <p className="mt-4 whitespace-pre-line text-sm leading-6 text-muted-foreground [overflow-wrap:anywhere] md:mt-5 md:leading-7">{artwork.description}</p>}
@@ -151,16 +144,20 @@ function ArtworkPage() {
               </div>
             )}
             <div className="mt-6 md:mt-9"><AcquisitionButton artwork={artwork} /></div>
-            <InquiryDialog artwork={artwork.title}>
-              <button className="mt-5 flex w-full items-center justify-center gap-2 text-[10px] uppercase tracking-[.18em] text-primary hover:text-accent"><MessageCircle className="h-4 w-4" strokeWidth={1.2} /> Bespoke inquiry</button>
-            </InquiryDialog>
+            <Link
+              to="/contact"
+              search={{ piece: artwork.title }}
+              className="mt-5 flex w-full items-center justify-center gap-2 text-[10px] uppercase tracking-[.18em] text-primary hover:text-accent"
+            >
+              <MessageCircle className="h-4 w-4" strokeWidth={1.2} /> Bespoke inquiry
+            </Link>
             <div className="mt-5 flex gap-3 border-t border-border pt-4 text-xs leading-5 text-muted-foreground md:mt-7 md:pt-6"><ShieldCheck className="mt-0.5 h-4 w-4 shrink-0 text-primary" strokeWidth={1.1} /><p>One of a kind. Insured white-glove delivery is arranged and quoted privately.</p></div>
           </div>
         </aside>
       </div>
 
       <div className="glass-strong fixed inset-x-3 bottom-[max(.75rem,env(safe-area-inset-bottom))] z-30 flex items-center justify-between gap-2 p-2.5 pl-3 md:hidden">
-        <div className="min-w-0"><p className="truncate font-display text-base leading-tight">{artwork.title}</p><p className="mt-0.5 text-xs text-primary">{price}</p></div>
+        <div className="min-w-0"><p className="truncate font-display text-base leading-tight">{artwork.title}</p>{price && <p className="mt-0.5 text-xs text-primary">{price}</p>}</div>
         <AcquisitionButton artwork={artwork} compact />
       </div>
     </div>

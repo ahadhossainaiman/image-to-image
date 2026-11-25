@@ -2,7 +2,7 @@ export type CollectorReview = {
   id: string;
   title: string;
   quote: string;
-  stars: number;
+  stars: number | null;
   attribution: string;
   reviewerName?: string;
   location?: string;

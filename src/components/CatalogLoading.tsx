@@ -1,4 +1,5 @@
 import { Skeleton } from "@/components/ui/skeleton";
+import { cn } from "@/lib/utils";
 
 export function CatalogLoading({ page }: { page: "shop" | "collection" | "artwork" }) {
   if (page === "artwork") {
@@ -22,17 +23,17 @@ export function CatalogLoading({ page }: { page: "shop" | "collection" | "artwor
   }
 
   return (
-    <div className="mx-auto min-h-[80svh] max-w-[1500px] px-4 pt-8 sm:px-10 md:pt-16 lg:pt-24" role="status">
+    <div className={cn("mx-auto min-h-[80svh] px-4 pt-8 sm:px-8 md:pt-14 lg:pt-20", page === "shop" ? "max-w-[1600px]" : "max-w-[75rem]")} role="status">
       <span className="sr-only">{page === "shop" ? "Loading shop" : "Loading collection"}</span>
       <div aria-hidden="true">
         <Skeleton className="h-3 w-36" />
         <Skeleton className="mt-5 h-12 w-4/5 max-w-2xl md:h-20" />
         <Skeleton className="mt-5 h-4 w-3/4 max-w-lg" />
         {page === "shop" && <Skeleton className="mt-5 h-28 w-full md:mt-10" />}
-        <div className="mt-7 grid gap-x-10 gap-y-6 md:mt-12 md:grid-cols-2 lg:grid-cols-3">
-          <Skeleton className="aspect-[4/5] w-full" />
-          <Skeleton className="hidden aspect-[4/5] w-full md:block" />
-          <Skeleton className="hidden aspect-[4/5] w-full lg:block" />
+        <div className="mt-7 grid grid-cols-2 gap-x-3 sm:gap-x-5 md:mt-9 md:grid-cols-3 lg:gap-x-7">
+          <Skeleton className="aspect-square w-full" />
+          <Skeleton className="aspect-square w-full" />
+          <Skeleton className="hidden aspect-square w-full md:block" />
         </div>
       </div>
     </div>

@@ -5,6 +5,12 @@ import { getRouter } from "./router";
 import "./styles.css";
 
 const router = getRouter();
+const trackingWindow = window as Window & { fbq?: (command: string, event: string) => void };
+if (trackingWindow.fbq) {
+  router.subscribe("onResolved", ({ fromLocation, pathChanged }) => {
+    if (fromLocation && pathChanged) trackingWindow.fbq?.("track", "PageView");
+  });
+}
 
 const rootElement = document.getElementById("root");
 if (rootElement && !rootElement.innerHTML) {

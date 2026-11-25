@@ -40,6 +40,7 @@ describe("CMS collector identity", () => {
           reviewerName: "Updated Collector",
           location: "London, UK",
           image: "Old Name - Old Location",
+          quote: "Beautiful work.",
         },
       ],
     });
@@ -51,8 +52,13 @@ describe("CMS collector identity", () => {
   });
 
   it("does not show an actual image URL as a collector name", async () => {
-    find.mockResolvedValue({ items: [{ image: "https://example.com/a - b.jpg" }] });
+    find.mockResolvedValue({ items: [{ quote: "Beautiful work.", image: "https://example.com/a - b.jpg" }] });
     const reviews = await getCollectorReviews();
     expect(getCollectorIdentity(reviews[0]!)).toEqual({ name: "", location: "" });
+  });
+
+  it("returns no sample reviews when the CMS has no records", async () => {
+    find.mockResolvedValue({ items: [] });
+    expect(await getCollectorReviews()).toEqual([]);
   });
 });

@@ -1,5 +1,5 @@
 import { wixClient, isWixConfigured } from "./client";
-import { defaultCollectorReviews, type CollectorReview } from "@/data/reviews";
+import type { CollectorReview } from "@/data/reviews";
 
 function firstText(...values: unknown[]): string {
   return (
@@ -19,11 +19,10 @@ function legacyImageAttribution(value: unknown): string {
 /**
  * Fetches collector reviews dynamically from Wix Headless CMS.
  * Checks for a data collection named 'CollectorReviews' or 'Reviews'.
- * Falls back seamlessly to the curated local reviews if unconfigured or not found.
  */
 export async function getCollectorReviews(): Promise<CollectorReview[]> {
   if (!isWixConfigured()) {
-    return defaultCollectorReviews;
+    return [];
   }
 
   try {
@@ -35,21 +34,17 @@ export async function getCollectorReviews(): Promise<CollectorReview[]> {
         if (response.items && response.items.length > 0) {
           return response.items.map((item, index: number) => ({
             id: item._id || `review-${index}`,
-            title: item["title"] || item["name"] || "Collector Reflection",
-            quote: item["quote"] || item["review"] || item["content"] || item["description"] || "",
+            title: firstText(item["title"], item["name"]),
+            quote: firstText(item["quote"], item["review"], item["content"], item["description"]),
             stars:
-              typeof item["stars"] === "number"
-                ? item["stars"]
-                : typeof item["rating"] === "number"
-                  ? item["rating"]
-                  : 5,
+              [item["stars"], item["rating"]].find((value) => Number.isInteger(value) && value >= 1 && value <= 5) ?? null,
             attribution:
               firstText(
                 item["attribution"],
                 item["author"],
                 item["collector"],
                 legacyImageAttribution(item["image"]),
-              ) || "Verified Collector",
+              ),
             reviewerName: firstText(
               item["reviewerName"],
               item["authorName"],
@@ -66,19 +61,19 @@ export async function getCollectorReviews(): Promise<CollectorReview[]> {
                   : index % 2 === 1
                     ? ("light" as const)
                     : ("dark" as const),
-          }));
+          })).filter((review) => review.quote);
         }
       } catch {
         // Try next collection
       }
     }
 
-    return defaultCollectorReviews;
+    return [];
   } catch (error) {
     console.warn(
-      "Wix Headless: Failed to query reviews from Wix CMS, falling back to curated reviews:",
+      "Wix Headless: Failed to query reviews from Wix CMS:",
       error,
     );
-    return defaultCollectorReviews;
+    return [];
   }
 }

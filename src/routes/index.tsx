@@ -3,9 +3,7 @@ import { ArrowDown, ArrowRight, ArrowUpRight, Feather, Gem, Leaf, Sparkles } fro
 import { useLayoutEffect, useRef } from "react";
 import forestHero from "@/assets/enchanted-forest-hero.jpg";
 import angelDetail from "@/assets/angel-2.jpg";
-import { getLatestArtworks, getCategories, getCollectorReviews } from "@/lib/wix";
-import { ArtCardGrid } from "@/components/ArtCardGrid";
-import { InquiryDialog } from "@/components/InquiryDialog";
+import { getCategories, getCollectorReviews } from "@/lib/wix";
 import { CertificateStatement } from "@/components/CertificateStatement";
 import { CollectorReviewsSection } from "@/components/CollectorReviewsSection";
 import { CollectionImage } from "@/components/CollectionImage";
@@ -13,19 +11,18 @@ import { getPageHead } from "@/lib/seo";
 
 export const Route = createFileRoute("/")({
   loader: async () => {
-    const [selectedWorks, categories, reviews] = await Promise.all([
-      getLatestArtworks(),
+    const [categories, reviews] = await Promise.all([
       getCategories(),
       getCollectorReviews(),
     ]);
-    return { selectedWorks, categories, reviews };
+    return { categories, reviews };
   },
   head: () => getPageHead("/"),
   component: Index,
 });
 
 function Index() {
-  const { selectedWorks, categories, reviews } = Route.useLoaderData();
+  const { categories, reviews } = Route.useLoaderData();
   const taglineRowRef = useRef<HTMLDivElement>(null);
   const taglineRef = useRef<HTMLParagraphElement>(null);
   const subtitleRef = useRef<HTMLSpanElement>(null);
@@ -124,9 +121,7 @@ function Index() {
               <Link to="/shop" preload="intent" className="btn-art justify-center">
                 Explore the gallery <ArrowRight className="h-4 w-4" strokeWidth={1.2} />
               </Link>
-              <InquiryDialog>
-                <button className="btn-outline-art justify-center">Bespoke inquiry</button>
-              </InquiryDialog>
+              <Link to="/contact" className="btn-outline-art justify-center">Bespoke inquiry</Link>
             </div>
           </div>
         </div>
@@ -139,42 +134,30 @@ function Index() {
         </a>
       </section>
 
-      <section id="collections" className="relative mx-auto max-w-[1500px] scroll-mt-20 px-4 py-9 sm:px-10 md:scroll-mt-24 md:py-24 lg:pb-20">
-        <div className="mx-auto max-w-3xl text-center">
-          <div className="botanical-rule mx-auto w-fit eyebrow">The collections</div>
-          <h2 className="mt-3 text-4xl leading-[1.02] sm:mt-6 sm:text-6xl">Step into our <em className="text-accent">enchanted worlds</em></h2>
+      <section id="collections" aria-labelledby="collections-heading" className="mx-auto max-w-[75rem] scroll-mt-20 px-4 py-9 sm:px-8 md:scroll-mt-24 md:py-16">
+        <div className="mx-auto max-w-6xl text-center">
+          <div className="botanical-rule mx-auto w-fit eyebrow max-sm:gap-2 max-sm:before:w-5 max-sm:after:w-5 lg:text-sm">The collections</div>
+          <h2 id="collections-heading" className="mt-3 text-[clamp(2.375rem,6vw,5.25rem)] leading-[1.02] text-balance sm:mt-4">Step into our <em className="text-accent">enchanted worlds</em></h2>
           <p className="mx-auto mt-3 max-w-xl text-sm leading-relaxed sm:mt-6 sm:leading-7 text-muted-foreground">From celestial couture to embroidered woodland forms, every collection begins with a story and ends with an object unlike any other.</p>
         </div>
-        <div className="mt-6 grid gap-x-7 gap-y-6 md:mt-16 md:gap-y-12 sm:grid-cols-2 lg:mx-auto lg:w-[90%] lg:grid-cols-3">
-          {categories.map((category, index) => category.published ? (
-            <Link key={category.slug} to="/collections/$slug" params={{ slug: category.slug }} preload="intent" className="group block min-w-0">
-              <div className="glass-panel art-frame aspect-[4/5] p-2 transition-transform duration-500 group-hover:-translate-y-2 group-hover:border-primary/60">
-                <div className="absolute inset-2 overflow-hidden sm:inset-3 bg-muted">
+        <div className="mt-6 grid grid-cols-3 gap-2 sm:gap-5 md:mt-9 lg:gap-6">
+          {categories.map((category) => (
+            <Link key={category.slug} to="/collections/$slug" params={{ slug: category.slug }} preload="intent" aria-labelledby={`collection-title-${category.slug}`} className="glass-panel group flex min-w-0 flex-col p-1.5 transition-colors hover:border-primary/60 focus-visible:outline-2 focus-visible:outline-primary sm:p-2">
+              <div className="art-frame aspect-[4/3] sm:aspect-[3/2]">
+                <div className="absolute inset-0 overflow-hidden">
                   {category.image && <CollectionImage key={category.image} src={category.image} alt={category.name} />}
-                  <div className="absolute inset-0 bg-gradient-to-t from-background/85 via-transparent to-transparent" />
-                  <span className="absolute left-3 top-3 sm:left-5 sm:top-5 text-[9px] tracking-[.25em] text-accent">0{index + 1}</span>
-                  <div className="absolute inset-x-3 bottom-3 flex items-center gap-2 sm:inset-x-4 sm:bottom-5">
-                    <div className="@container min-w-0 flex-1">
-                      <h3 className="truncate text-[clamp(.75rem,8cqw,1.875rem)] leading-tight">{category.shortName}</h3>
-                    </div>
-                    <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-primary/40 bg-background/25 backdrop-blur-md transition-colors group-hover:bg-primary group-hover:text-primary-foreground xl:h-10 xl:w-10"><ArrowUpRight className="h-4 w-4" strokeWidth={1.1} /></span>
-                  </div>
                 </div>
               </div>
-              <p className="mt-2 max-w-sm text-xs leading-relaxed sm:mt-5 sm:leading-6 text-muted-foreground">{category.description}</p>
-            </Link>
-          ) : (
-            <div key={category.slug} className="group block" aria-label="A future collection is being prepared">
-              <div className="glass-panel relative flex flex-col items-center justify-center overflow-hidden px-4 py-12 sm:aspect-[4/5] sm:p-8 text-center">
-                <div className="absolute left-1/2 top-1/2 h-48 w-48 -translate-x-1/2 -translate-y-1/2 rounded-full border border-primary/10" />
-                <div className="absolute left-1/2 top-1/2 h-64 w-64 -translate-x-1/2 -translate-y-1/2 rounded-full border border-primary/5" />
-                <span className="absolute left-6 top-6 text-[9px] tracking-[.25em] text-primary">0{index + 1}</span>
-                <Sparkles className="h-6 w-6 text-primary" strokeWidth={.8} />
-                <p className="eyebrow mt-4 sm:mt-7">In the atelier</p>
-                <h3 className="mt-4 text-3xl text-muted-foreground">A new story is<br />taking shape</h3>
+              <div className="flex flex-1 flex-col px-1 pt-2 pb-1.5 sm:px-2 sm:pt-3 sm:pb-2">
+                <div className="grid min-h-7 items-center gap-1.5 sm:flex sm:justify-between sm:gap-2">
+                  <div className="@container min-w-0 flex-1">
+                    <h3 id={`collection-title-${category.slug}`} className="text-[clamp(.875rem,8.5cqw,1.5rem)] leading-tight [overflow-wrap:anywhere]">{category.shortName}</h3>
+                  </div>
+                  <span className="grid size-5 shrink-0 place-items-center rounded-full border border-primary/40 transition-colors group-hover:bg-primary group-hover:text-primary-foreground sm:size-8"><ArrowUpRight className="size-3 sm:size-4" strokeWidth={1.1} aria-hidden="true" /></span>
+                </div>
+                {category.description && <p className="mt-1.5 text-xs leading-relaxed text-muted-foreground sm:mt-2 lg:text-sm">{category.description}</p>}
               </div>
-              <p className="mt-2 text-xs leading-relaxed text-muted-foreground sm:mt-5 sm:leading-6">A future body of work, quietly being imagined by hand.</p>
-            </div>
+            </Link>
           ))}
         </div>
       </section>
@@ -208,12 +191,17 @@ function Index() {
         </div>
       </section>
 
-      <section className="mx-auto max-w-[1400px] px-4 pt-7 pb-5 sm:px-10 md:py-24 lg:pt-20 lg:pb-18">
-        <div className="flex flex-col gap-3 border-b border-border pb-4 sm:gap-6 sm:pb-8 sm:flex-row sm:items-end sm:justify-between">
-          <div><p className="eyebrow">Selected works</p><h2 className="mt-2 text-4xl sm:mt-4 sm:text-6xl">From the atelier</h2><CertificateStatement className="mt-3 max-w-xl sm:mt-5" /></div>
-          <Link to="/shop" preload="intent" className="flex w-fit items-center gap-3 text-[10px] uppercase tracking-[.2em] text-primary hover:text-accent">View all works <ArrowUpRight className="h-4 w-4" /></Link>
+      <section aria-labelledby="selected-works-heading" className="mx-auto max-w-[1400px] px-4 py-6 sm:px-10 md:py-12">
+        <div className="border border-primary bg-[image:var(--gradient-gold)] px-5 py-6 text-[oklch(0.34_0.076_80)] sm:px-9 sm:py-9 lg:px-14 lg:py-12">
+          <div className="bg-forest px-4 py-7 text-center sm:px-8 sm:py-10">
+            <h2 id="selected-works-heading" className="text-[clamp(3rem,7.5vw,6.5rem)] leading-[.92] text-accent">Atelier</h2>
+            <p className="mx-auto mt-4 max-w-xl text-sm leading-relaxed text-foreground sm:mt-5 sm:leading-7">Every piece is shaped, stitched and finished individually. No moulded editions, no repeated works: only singular objects with their own presence, provenance and story.</p>
+            <Link to="/shop" preload="intent" className="btn-art mt-6 min-h-12 text-sm tracking-wide sm:mt-8">
+              View All Works <ArrowUpRight className="size-4" aria-hidden="true" />
+            </Link>
+          </div>
+          <CertificateStatement className="mt-4 justify-center gap-2 text-center text-xs leading-5 font-semibold tracking-wide text-forest [&>svg]:text-current sm:mt-5 lg:items-center lg:text-[11px] lg:tracking-normal lg:whitespace-nowrap lg:[&>svg]:mt-0 xl:text-xs xl:tracking-wide" />
         </div>
-        <ArtCardGrid artworks={selectedWorks} />
       </section>
 
       {/* Collector Reflections & Reviews */}
@@ -225,7 +213,10 @@ function Index() {
           <p className="eyebrow mt-4 sm:mt-7">A work of your own</p>
           <h2 className="mx-auto mt-3 max-w-3xl text-4xl leading-[1.02] sm:mt-5 sm:text-6xl">Some stories are waiting{" "}<br className="hidden sm:block" /><em className="text-accent">to be made.</em></h2>
           <p className="mx-auto mt-3 max-w-lg text-sm leading-relaxed sm:mt-6 sm:leading-7 text-muted-foreground">Commission a bespoke work exclusively designed and created for you, a meaningful person or occasion, or for your private collection. We will contact you and set up a 15-minute, no-obligation discussion about your vision.</p>
-          <InquiryDialog><button className="btn-art mt-5 sm:mt-9">Begin a bespoke inquiry <ArrowRight className="h-4 w-4" /></button></InquiryDialog>
+          <div className="mt-5 flex flex-wrap justify-center gap-3 sm:mt-9">
+            <Link to="/contact" className="btn-art">Begin a bespoke inquiry <ArrowRight className="h-4 w-4" /></Link>
+            <Link to="/contact" className="btn-outline-art">Contact Us</Link>
+          </div>
         </div>
       </section>
     </>

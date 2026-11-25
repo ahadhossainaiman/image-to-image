@@ -21,7 +21,6 @@ export function CartDrawer({ children }: { children: ReactNode }) {
               {items.length} {items.length === 1 ? "singular work" : "singular works"} selected
             </DialogDescription>
           </div>
-          <ShoppingBag className="mt-2 h-5 w-5 text-primary" strokeWidth={1.1} />
         </div>
         <div className="flex-1 overflow-y-auto px-7">
           {items.length === 0 ? (
@@ -41,12 +40,12 @@ export function CartDrawer({ children }: { children: ReactNode }) {
                     {item.image ? (
                       <img src={item.image} alt={item.title} className="aspect-[4/5] w-full object-cover" />
                     ) : (
-                      <div className="aspect-[4/5] w-full flex items-center justify-center text-xs text-muted-foreground">Artwork</div>
+                      <div className="aspect-[4/5] w-full" />
                     )}
                   </Link></DialogClose>
                   <div className="flex min-w-0 flex-1 flex-col py-1">
                     <DialogClose asChild><Link to="/artwork/$slug" params={{ slug: item.slug }} className="font-display text-2xl leading-tight hover:text-accent">{item.title}</Link></DialogClose>
-                    <p className="mt-2 text-xs text-muted-foreground">{item.formattedPrice}</p>
+                    {item.formattedPrice && <p className="mt-2 text-xs text-muted-foreground">{item.formattedPrice}</p>}
                     <button onClick={() => removeFromCart(item.slug)} className="mt-auto flex items-center gap-2 self-start text-[10px] uppercase tracking-[.16em] text-muted-foreground hover:text-foreground">
                       <X className="h-3 w-3" /> Remove
                     </button>

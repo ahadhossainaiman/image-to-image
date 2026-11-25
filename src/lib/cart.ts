@@ -1,7 +1,8 @@
 import { useSyncExternalStore } from "react";
 import { wixClient, isWixConfigured, ensureVisitorTokens } from "@/lib/wix/client";
 import { formatWixImageUrl } from "@/lib/wix/types";
-import { getArtwork, type Artwork } from "@/data/catalog";
+import type { Artwork } from "@/data/catalog";
+import { formatPrice } from "@/lib/currency";
 import { setCartDrawerOpen } from "@/lib/cart-drawer";
 
 const WIX_STORES_APP_ID = "1380b703-ce81-ff05-f115-39571d94dfcd";
@@ -17,13 +18,15 @@ export interface CartItemDetail {
   title: string;
   reference: string;
   price: number | null;
+  currency?: string | undefined;
   formattedPrice: string;
   image: string;
   qty: number;
 }
 
 let items: CartItem[] = [];
-let detailsMap = new Map<string, CartItemDetail>();
+type StoredCartDetail = Omit<CartItemDetail, "formattedPrice">;
+let detailsMap = new Map<string, StoredCartDetail>();
 let loaded = false;
 const subs = new Set<() => void>();
 
@@ -42,7 +45,9 @@ function load() {
 
     try {
       const storedDetails = JSON.parse(localStorage.getItem(DETAILS_KEY) || "[]");
-      detailsMap = new Map(storedDetails.map((d: CartItemDetail) => [d.slug, d]));
+      detailsMap = new Map(storedDetails
+        .filter((detail: StoredCartDetail) => !("formattedPrice" in detail))
+        .map((detail: StoredCartDetail) => [detail.slug, detail]));
     } catch {
       detailsMap = new Map();
     }
@@ -87,7 +92,7 @@ export async function syncCartWithWix(): Promise<void> {
         const catalogItemId = li.catalogReference?.catalogItemId || li._id || "";
         const slug = catalogItemId;
         const rawPrice = li.price?.amount ? parseFloat(li.price.amount) : null;
-        const title = li.productName?.original || "Artwork";
+        const title = li.productName?.original ?? "";
         const image = formatWixImageUrl(li.image);
 
         nextItems.push({ slug, qty: 1 });
@@ -96,9 +101,9 @@ export async function syncCartWithWix(): Promise<void> {
           lineItemId: li._id,
           productId: catalogItemId,
           title,
-          reference: `THOA-${catalogItemId.slice(0, 6).toUpperCase()}`,
+          reference: li.physicalProperties?.sku ?? "",
           price: rawPrice,
-          formattedPrice: li.price?.formattedAmount || (rawPrice != null ? `$${rawPrice}` : "Price on request"),
+          currency: serverCart.currency,
           image,
           qty: 1,
         });
@@ -144,27 +149,14 @@ export function useCartDetails(): CartItemDetail[] {
 
   return currentItems.map((item) => {
     const cached = detailsMap.get(item.slug);
-    if (cached) return cached;
-
-    const catalogArt = getArtwork(item.slug);
-    if (catalogArt) {
-      return {
-        slug: item.slug,
-        title: catalogArt.title,
-        reference: catalogArt.reference,
-        price: catalogArt.price,
-        formattedPrice: catalogArt.price != null ? `$${catalogArt.price.toLocaleString()}` : "Price on request",
-        image: catalogArt.images[0]?.src || "",
-        qty: 1,
-      };
-    }
+    if (cached) return { ...cached, formattedPrice: formatPrice(cached) };
 
     return {
       slug: item.slug,
-      title: "Singular Artwork",
-      reference: `THOA-${item.slug.slice(0, 6).toUpperCase()}`,
+      title: "",
+      reference: "",
       price: null,
-      formattedPrice: "Price on request",
+      formattedPrice: "",
       image: "",
       qty: 1,
     };
@@ -174,7 +166,7 @@ export function useCartDetails(): CartItemDetail[] {
 /**
  * Adds an artwork to the active cart. Capped at 1 copy (one of a kind).
  */
-export const addToCart = (artworkOrSlug: string | Artwork | { slug: string; title?: string; price?: number | null; images?: Array<{ src: string }> }) => {
+export const addToCart = (artworkOrSlug: string | (Pick<Artwork, "slug"> & Partial<Pick<Artwork, "title" | "price" | "currency" | "reference" | "images">>)) => {
   load();
   const slug = typeof artworkOrSlug === "string" ? artworkOrSlug : artworkOrSlug.slug;
   if (!slug) return;
@@ -183,10 +175,10 @@ export const addToCart = (artworkOrSlug: string | Artwork | { slug: string; titl
     set([...items, { slug, qty: 1 }]);
 
     if (typeof artworkOrSlug !== "string") {
-      const title = artworkOrSlug.title || "Singular Artwork";
+      const title = artworkOrSlug.title ?? "";
       const price = artworkOrSlug.price ?? null;
       const image = artworkOrSlug.images?.[0]?.src || "";
-      const reference = (artworkOrSlug as Artwork).reference || `THOA-${slug.slice(0, 6).toUpperCase()}`;
+      const reference = artworkOrSlug.reference ?? "";
 
       detailsMap.set(slug, {
         slug,
@@ -194,7 +186,7 @@ export const addToCart = (artworkOrSlug: string | Artwork | { slug: string; titl
         title,
         reference,
         price,
-        formattedPrice: price != null ? `$${price.toLocaleString()}` : "Price on request",
+        currency: artworkOrSlug.currency,
         image,
         qty: 1,
       });

@@ -1,26 +1,19 @@
 import { wixClient, isWixConfigured } from "./client";
 import { mapWixProductToArtwork, mapWixCollectionToCategory } from "./types";
-import {
-  artworks as localArtworks,
-  publicCategories as localCategories,
-  getArtwork as getLocalArtwork,
-  getCategory as getLocalCategory,
-  artworksIn as localArtworksIn,
-  type Artwork,
-  type Category,
-} from "@/data/catalog";
+import type { Artwork, Category } from "@/data/catalog";
 
 const collectionOrder = new Map([
   ["the queen collection", 0],
   ["the queen's court", 1],
   ["the queen's kingdom", 2],
   ["the mushroom woodland", 3],
-  ["the mushroom woodlands", 3],
 ]);
 
 function collectionRank(category: Category): number {
   const name = category.shortName.toLowerCase().replace(/’/g, "'");
-  return collectionOrder.get(name) ?? collectionOrder.size;
+  if (/^(?:#\s*|category\s+)?5$/.test(name)) return 4;
+  if (/^(?:#\s*|category\s+)?6$/.test(name)) return 5;
+  return collectionOrder.get(name) ?? 6;
 }
 
 type WixQueryPage<T> = {
@@ -40,51 +33,20 @@ async function collectQueryItems<T>(page: WixQueryPage<T>): Promise<T[]> {
 
 /**
  * Fetches all published artworks.
- * Queries Wix Stores if configured; falls back cleanly to local catalog otherwise.
  */
 export async function getArtworks(): Promise<Artwork[]> {
   if (!isWixConfigured()) {
-    return localArtworks.filter((a) => a.published);
+    return [];
   }
 
   try {
     const firstPage = await wixClient.products.queryProducts().limit(100).find();
     const items = await collectQueryItems(firstPage);
-    if (items.length > 0) {
-      return items
-        .filter((item): item is NonNullable<typeof item> => Boolean(item))
-        .map(mapWixProductToArtwork)
-        .filter((a) => a.published);
-    }
-    return localArtworks.filter((a) => a.published);
+    return items.filter(Boolean).map(mapWixProductToArtwork).filter((a) => a.published);
   } catch (error) {
-    console.warn("Wix Headless: Failed to query products from Wix Stores, falling back to local catalog:", error);
-    return localArtworks.filter((a) => a.published);
+    console.warn("Wix Headless: Failed to query products:", error);
+    return [];
   }
-}
-
-/** Fetches the three newest public artworks for the homepage. */
-export async function getLatestArtworks(): Promise<Artwork[]> {
-  const limit = 3;
-  if (isWixConfigured()) {
-    try {
-      // Wix assigns increasing numeric IDs as products are created.
-      let page = await wixClient.products.queryProducts().descending("numericId").limit(limit).find();
-      const latest: Artwork[] = [];
-      while (true) {
-        const published = page.items
-          .filter((item) => item && item.visible !== false)
-          .slice(0, limit - latest.length)
-          .map(mapWixProductToArtwork);
-        latest.push(...published);
-        if (latest.length === limit || !page.hasNext()) return latest;
-        page = await page.next();
-      }
-    } catch (error) {
-      console.warn("Wix Headless: Failed to query the latest products, falling back to local catalog:", error);
-    }
-  }
-  return localArtworks.filter((artwork) => artwork.published).slice(0, limit);
 }
 
 /**
@@ -92,7 +54,7 @@ export async function getLatestArtworks(): Promise<Artwork[]> {
  */
 export async function getArtworkBySlug(slug: string): Promise<Artwork | undefined> {
   if (!isWixConfigured()) {
-    return getLocalArtwork(slug);
+    return undefined;
   }
 
   try {
@@ -109,11 +71,10 @@ export async function getArtworkBySlug(slug: string): Promise<Artwork | undefine
       return mapWixProductToArtwork(firstById);
     }
 
-    // Fallback to local catalog
-    return getLocalArtwork(slug);
+    return undefined;
   } catch (error) {
-    console.warn(`Wix Headless: Error fetching product '${slug}', falling back:`, error);
-    return getLocalArtwork(slug);
+    console.warn(`Wix Headless: Error fetching product '${slug}':`, error);
+    return undefined;
   }
 }
 
@@ -122,23 +83,18 @@ export async function getArtworkBySlug(slug: string): Promise<Artwork | undefine
  */
 export async function getCategories(): Promise<Category[]> {
   if (!isWixConfigured()) {
-    return localCategories();
+    return [];
   }
 
   try {
     const firstPage = await wixClient.collections.queryCollections().limit(50).find();
     const items = await collectQueryItems(firstPage);
-    if (items.length > 0) {
-      return items
-        .filter((item): item is NonNullable<typeof item> => Boolean(item))
-        .map(mapWixCollectionToCategory)
-        .filter((c) => c.published)
-        .sort((a, b) => collectionRank(a) - collectionRank(b));
-    }
-    return localCategories();
+    return items.filter(Boolean).map(mapWixCollectionToCategory)
+      .filter((c) => c.published)
+      .sort((a, b) => collectionRank(a) - collectionRank(b));
   } catch (error) {
-    console.warn("Wix Headless: Failed to query collections, falling back to local:", error);
-    return localCategories();
+    console.warn("Wix Headless: Failed to query collections:", error);
+    return [];
   }
 }
 
@@ -147,7 +103,7 @@ export async function getCategories(): Promise<Category[]> {
  */
 export async function getCategoryBySlug(slug: string): Promise<Category | undefined> {
   if (!isWixConfigured()) {
-    return getLocalCategory(slug);
+    return undefined;
   }
 
   try {
@@ -155,10 +111,10 @@ export async function getCategoryBySlug(slug: string): Promise<Category | undefi
     if (response.collection) {
       return mapWixCollectionToCategory(response.collection);
     }
-    return getLocalCategory(slug);
+    return undefined;
   } catch (error) {
-    console.warn(`Wix Headless: Error fetching category '${slug}', falling back:`, error);
-    return getLocalCategory(slug);
+    console.warn(`Wix Headless: Error fetching category '${slug}':`, error);
+    return undefined;
   }
 }
 
@@ -190,15 +146,10 @@ export async function getArtworksByCategory(category: Category): Promise<Artwork
         .hasSome("collectionIds", [category.wixCollectionId])
         .limit(100)
         .find();
-      if (prodResponse.items && prodResponse.items.length > 0) {
-        return prodResponse.items
-          .filter((item): item is NonNullable<typeof item> => Boolean(item))
-          .map(mapWixProductToArtwork)
-          .filter((a) => a.published);
-      }
+      return (await collectQueryItems(prodResponse)).filter(Boolean).map(mapWixProductToArtwork).filter((a) => a.published);
     } catch (error) {
       console.warn(`Wix Headless: Error fetching artworks for category '${category.slug}':`, error);
     }
   }
-  return localArtworksIn(category.slug);
+  return [];
 }

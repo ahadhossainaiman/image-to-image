@@ -3,7 +3,6 @@ import { createPortal } from "react-dom";
 import { useEffect, useState, type FormEvent } from "react";
 import { ArrowRight, Instagram, LockKeyhole, Menu, ShoppingBag, X } from "lucide-react";
 import { useCart } from "@/lib/cart";
-import { currencyOptions, useCurrency, type CurrencyCode } from "@/lib/currency";
 import { CartDrawer } from "@/components/CartDrawer";
 
 const nav = [
@@ -11,7 +10,7 @@ const nav = [
   { to: "/shop", label: "Collections" },
   { to: "/atelier-story", label: "Atelier Story" },
   { to: "/about-the-artists", label: "About The Artists" },
-  { to: "/contact", label: "Bespoke Inquiry" },
+  { to: "/contact", label: "Contact Us" },
 ] as const;
 
 function Brand({ logoClassName = "h-auto w-30 sm:w-38" }: { logoClassName?: string }) {
@@ -24,7 +23,6 @@ function Brand({ logoClassName = "h-auto w-30 sm:w-38" }: { logoClassName?: stri
 
 export function SiteHeader() {
   const cart = useCart();
-  const { currency, setCurrency } = useCurrency();
   const [open, setOpen] = useState(false);
 
   useEffect(() => {
@@ -44,7 +42,7 @@ export function SiteHeader() {
               key={item.to}
               to={item.to}
               preload={item.to === "/shop" ? "intent" : false}
-              className="text-[10px] uppercase tracking-[.2em] text-muted-foreground transition-colors hover:text-accent"
+              className="text-xs uppercase tracking-[.2em] text-muted-foreground transition-colors hover:text-accent"
               activeProps={{ className: "text-accent" }}
               activeOptions={{ exact: item.to === "/" }}
             >
@@ -53,18 +51,6 @@ export function SiteHeader() {
           ))}
         </nav>
         <div className="flex shrink-0 items-center gap-1 sm:gap-4">
-          <label className="hidden items-center gap-2 border-r border-border pr-4 sm:flex">
-            <span className="sr-only">Display currency</span>
-            <select
-              aria-label="Display currency"
-              value={currency}
-              onChange={(event) => setCurrency(event.target.value as CurrencyCode)}
-              className="cursor-pointer bg-transparent text-[10px] tracking-[.16em] text-muted-foreground outline-none hover:text-accent"
-              title="Indicative display conversion"
-            >
-              {currencyOptions.map((option) => <option key={option.code} value={option.code} className="bg-background text-foreground">{option.label}</option>)}
-            </select>
-          </label>
           <CartDrawer>
             <button aria-label={`Open shopping cart with ${cart.length} items`} className="relative flex size-11 sm:size-10 items-center justify-center rounded-full transition-colors hover:bg-primary/10">
               <ShoppingBag className="h-[18px] w-[18px]" strokeWidth={1.15} />
@@ -98,11 +84,8 @@ export function SiteHeader() {
               </Link>
             ))}
           </nav>
-          <div className="flex items-center justify-between gap-3 border-t border-border pt-3 sm:pt-6">
+          <div className="border-t border-border pt-3 sm:pt-6">
             <p className="text-[9px] uppercase tracking-[.2em] text-muted-foreground">One of a kind. Always.</p>
-            <select aria-label="Mobile display currency" value={currency} onChange={(event) => setCurrency(event.target.value as CurrencyCode)} className="bg-transparent text-[10px] tracking-[.16em] text-primary outline-none">
-              {currencyOptions.map((option) => <option key={option.code} value={option.code} className="bg-background">{option.label}</option>)}
-            </select>
           </div>
         </div>,
         document.body,
