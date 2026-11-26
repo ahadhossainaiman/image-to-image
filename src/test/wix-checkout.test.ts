@@ -16,27 +16,30 @@ vi.mock("@/lib/wix/client", () => ({
   },
 }));
 
-describe("Wix checkout currency", () => {
+describe("Wix Hosted Checkout", () => {
   beforeEach(() => vi.resetAllMocks());
 
-  it.each([
-    { currency: "BDT" },
-    { currency: "USD", conversionCurrency: "BDT" },
-    {},
-  ])("does not create checkout for an unverified USD cart (%j)", async (cart) => {
-    wix.getCart.mockResolvedValue(cart);
-    expect(await redirectToWixCheckout()).toEqual({ error: "USD checkout is unavailable. Please contact the atelier." });
+  it("does not create checkout for an empty Wix cart", async () => {
+    wix.getCart.mockResolvedValue({ currency: "BDT", lineItems: [] });
+    expect(await redirectToWixCheckout()).toEqual({ error: "Your cart is empty. Add an artwork before checking out." });
     expect(wix.createCheckout).not.toHaveBeenCalled();
     expect(wix.createRedirect).not.toHaveBeenCalled();
   });
 
-  it("creates a checkout once the cart uses confirmed USD pricing", async () => {
-    wix.getCart.mockResolvedValue({ currency: "USD", conversionCurrency: "USD" });
+  it.each(["BDT", "USD"])("creates hosted checkout for a %s cart", async (currency) => {
+    wix.getCart.mockResolvedValue({ currency, lineItems: [{ _id: "cart-line" }] });
     wix.createCheckout.mockResolvedValue({ checkoutId: "checkout" });
     wix.createRedirect.mockResolvedValue({});
 
-    await redirectToWixCheckout();
+    expect(await redirectToWixCheckout()).toEqual({ error: "No redirect URL returned by Wix Headless." });
     expect(wix.createCheckout).toHaveBeenCalledWith({ channelType: "WEB" });
-    expect(wix.createRedirect).toHaveBeenCalledWith(expect.objectContaining({ ecomCheckout: { checkoutId: "checkout" } }));
+    expect(wix.createRedirect).toHaveBeenCalledWith({
+      ecomCheckout: { checkoutId: "checkout" },
+      callbacks: {
+        postFlowUrl: `${window.location.origin}/cart?checkout=completed`,
+        thankYouPageUrl: `${window.location.origin}/cart?checkout=success`,
+        cartPageUrl: `${window.location.origin}/cart`,
+      },
+    });
   });
 });

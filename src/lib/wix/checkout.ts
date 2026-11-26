@@ -1,5 +1,4 @@
 import { wixClient, isWixConfigured, ensureVisitorTokens } from "./client";
-import { isUsd } from "@/lib/currency";
 
 export interface CheckoutRedirectOptions {
   postFlowUrl?: string;
@@ -23,8 +22,8 @@ export async function redirectToWixCheckout(options?: CheckoutRedirectOptions): 
     await ensureVisitorTokens();
 
     const cart = await wixClient.currentCart.getCurrentCart();
-    if (!isUsd(cart.currency) || !isUsd(cart.conversionCurrency || cart.currency)) {
-      return { error: "USD checkout is unavailable. Please contact the atelier." };
+    if (!cart.lineItems?.length) {
+      return { error: "Your cart is empty. Add an artwork before checking out." };
     }
 
     const baseUrl = window.location.origin;

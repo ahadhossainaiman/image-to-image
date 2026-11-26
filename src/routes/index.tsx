@@ -4,7 +4,6 @@ import { useLayoutEffect, useRef } from "react";
 import forestHero from "@/assets/enchanted-forest-hero.jpg";
 import angelDetail from "@/assets/angel-2.jpg";
 import { getCategories, getCollectorReviews } from "@/lib/wix";
-import { CertificateStatement } from "@/components/CertificateStatement";
 import { CollectorReviewsSection } from "@/components/CollectorReviewsSection";
 import { CollectionImage } from "@/components/CollectionImage";
 import { getPageHead } from "@/lib/seo";
@@ -106,7 +105,7 @@ function Index() {
             </picture>
             <div ref={taglineRowRef} className="mt-5 [contain:inline-size] max-lg:col-span-2 sm:mt-6">
               <p ref={taglineRef} className="eyebrow text-[.72rem] tracking-[.08em] whitespace-nowrap max-lg:leading-snug sm:text-sm lg:w-max lg:text-[length:var(--home-tagline-size,var(--text-sm))]">
-                DISCOVER THE BEAUTY WITHIN™
+                DISCOVER THE BEAUTY WITHIN<span className="align-text-top text-[0.65em] tracking-normal">™</span>
               </p>
             </div>
             <p className="col-span-2 mt-4 font-display italic leading-snug text-foreground max-lg:text-[clamp(.9375rem,6.65cqw,1.75rem)] sm:mt-5 lg:text-3xl">
@@ -121,7 +120,7 @@ function Index() {
               <Link to="/shop" preload="intent" className="btn-art justify-center">
                 Explore the gallery <ArrowRight className="h-4 w-4" strokeWidth={1.2} />
               </Link>
-              <Link to="/contact" className="btn-outline-art justify-center">Bespoke inquiry</Link>
+              <Link to="/contact" className="btn-outline-art justify-center">Bespoke enquiry</Link>
             </div>
           </div>
         </div>
@@ -134,29 +133,29 @@ function Index() {
         </a>
       </section>
 
-      <section id="collections" aria-labelledby="collections-heading" className="mx-auto max-w-[75rem] scroll-mt-20 px-4 py-9 sm:px-8 md:scroll-mt-24 md:py-16">
-        <div className="mx-auto max-w-6xl text-center">
-          <div className="botanical-rule mx-auto w-fit eyebrow max-sm:gap-2 max-sm:before:w-5 max-sm:after:w-5 lg:text-sm">The collections</div>
-          <h2 id="collections-heading" className="mt-3 text-[clamp(2.375rem,6vw,5.25rem)] leading-[1.02] text-balance sm:mt-4">Step into our <em className="text-accent">enchanted worlds</em></h2>
+      <section id="collections" aria-labelledby="collections-heading" className="relative mx-auto max-w-[1500px] scroll-mt-20 px-4 py-9 sm:px-10 md:scroll-mt-24 md:py-24 lg:pb-20">
+        <div className="mx-auto max-w-3xl text-center">
+          <div className="botanical-rule mx-auto w-fit eyebrow max-sm:gap-2 max-sm:before:w-5 max-sm:after:w-5">The collections</div>
+          <h2 id="collections-heading" className="mt-3 text-4xl leading-[1.02] text-balance sm:mt-6 sm:text-6xl">Step into our <em className="text-accent">enchanted worlds</em></h2>
           <p className="mx-auto mt-3 max-w-xl text-sm leading-relaxed sm:mt-6 sm:leading-7 text-muted-foreground">From celestial couture to embroidered woodland forms, every collection begins with a story and ends with an object unlike any other.</p>
         </div>
-        <div className="mt-6 grid grid-cols-3 gap-2 sm:gap-5 md:mt-9 lg:gap-6">
-          {categories.map((category) => (
-            <Link key={category.slug} to="/collections/$slug" params={{ slug: category.slug }} preload="intent" aria-labelledby={`collection-title-${category.slug}`} className="glass-panel group flex min-w-0 flex-col p-1.5 transition-colors hover:border-primary/60 focus-visible:outline-2 focus-visible:outline-primary sm:p-2">
-              <div className="art-frame aspect-[4/3] sm:aspect-[3/2]">
-                <div className="absolute inset-0 overflow-hidden">
+        <div className="mt-6 grid gap-x-7 gap-y-6 md:mt-16 md:gap-y-12 sm:grid-cols-2 lg:mx-auto lg:w-[90%] lg:grid-cols-3">
+          {categories.map((category, index) => (
+            <Link key={category.slug} to="/collections/$slug" params={{ slug: category.slug }} preload="intent" className="group block min-w-0">
+              <div className="glass-panel art-frame aspect-[4/5] p-2 transition-transform duration-500 group-hover:-translate-y-2 group-hover:border-primary/60">
+                <div className="absolute inset-2 overflow-hidden sm:inset-3 bg-muted">
                   {category.image && <CollectionImage key={category.image} src={category.image} alt={category.name} />}
-                </div>
-              </div>
-              <div className="flex flex-1 flex-col px-1 pt-2 pb-1.5 sm:px-2 sm:pt-3 sm:pb-2">
-                <div className="grid min-h-7 items-center gap-1.5 sm:flex sm:justify-between sm:gap-2">
-                  <div className="@container min-w-0 flex-1">
-                    <h3 id={`collection-title-${category.slug}`} className="text-[clamp(.875rem,8.5cqw,1.5rem)] leading-tight [overflow-wrap:anywhere]">{category.shortName}</h3>
+                  <div className="absolute inset-0 bg-gradient-to-t from-background/85 via-transparent to-transparent" />
+                  <span className="absolute left-3 top-3 sm:left-5 sm:top-5 text-[9px] tracking-[.25em] text-accent">0{index + 1}</span>
+                  <div className="absolute inset-x-3 bottom-3 flex items-center gap-2 sm:inset-x-4 sm:bottom-5">
+                    <div className="@container min-w-0 flex-1">
+                      <h3 className="truncate text-[clamp(.75rem,8cqw,1.875rem)] leading-tight">{category.shortName}</h3>
+                    </div>
+                    <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-primary/40 bg-background/25 backdrop-blur-md transition-colors group-hover:bg-primary group-hover:text-primary-foreground xl:h-10 xl:w-10"><ArrowUpRight className="h-4 w-4" strokeWidth={1.1} /></span>
                   </div>
-                  <span className="grid size-5 shrink-0 place-items-center rounded-full border border-primary/40 transition-colors group-hover:bg-primary group-hover:text-primary-foreground sm:size-8"><ArrowUpRight className="size-3 sm:size-4" strokeWidth={1.1} aria-hidden="true" /></span>
                 </div>
-                {category.description && <p className="mt-1.5 text-xs leading-relaxed text-muted-foreground sm:mt-2 lg:text-sm">{category.description}</p>}
               </div>
+              {category.description && <p className="mt-2 max-w-sm text-xs leading-relaxed sm:mt-5 sm:leading-6 text-muted-foreground">{category.description}</p>}
             </Link>
           ))}
         </div>
@@ -164,10 +163,10 @@ function Index() {
 
       <section className="px-4 py-4 sm:px-10 md:py-10 lg:py-16">
         <div className="glass-panel relative mx-auto grid max-w-[1400px] overflow-hidden lg:grid-cols-[.85fr_1.15fr]">
-          <div className="relative aspect-[4/3] overflow-hidden md:min-h-[430px] lg:aspect-auto lg:min-h-[650px]">
+          <div className="@container relative aspect-[4/3] overflow-hidden md:min-h-[430px] lg:aspect-auto lg:min-h-[650px]">
             <img src={angelDetail} alt="Intricate hand-beaded celestial wing in gold and pearl" loading="lazy" className="absolute inset-0 h-full w-full object-cover" />
             <div className="absolute inset-0 bg-gradient-to-t from-background/65 via-transparent to-transparent" />
-            <p className="absolute inset-x-4 bottom-4 max-w-xs font-display text-xl sm:bottom-7 sm:left-7 sm:text-2xl italic">“The smallest stitch can hold an entire world.”</p>
+            <p className="absolute inset-x-4 bottom-4 font-display text-[clamp(.625rem,4.2cqw,1.5rem)] italic whitespace-nowrap sm:inset-x-7 sm:bottom-7">“The smallest stitch can hold an entire world.”</p>
           </div>
           <div className="flex flex-col justify-center p-5 sm:p-10 md:p-14 lg:p-20">
             <p className="eyebrow">Our artistic philosophy</p>
@@ -191,16 +190,20 @@ function Index() {
         </div>
       </section>
 
-      <section aria-labelledby="selected-works-heading" className="mx-auto max-w-[1400px] px-4 py-6 sm:px-10 md:py-12">
-        <div className="border border-primary bg-[image:var(--gradient-gold)] px-5 py-6 text-[oklch(0.34_0.076_80)] sm:px-9 sm:py-9 lg:px-14 lg:py-12">
-          <div className="bg-forest px-4 py-7 text-center sm:px-8 sm:py-10">
-            <h2 id="selected-works-heading" className="text-[clamp(3rem,7.5vw,6.5rem)] leading-[.92] text-accent">Atelier</h2>
-            <p className="mx-auto mt-4 max-w-xl text-sm leading-relaxed text-foreground sm:mt-5 sm:leading-7">Every piece is shaped, stitched and finished individually. No moulded editions, no repeated works: only singular objects with their own presence, provenance and story.</p>
-            <Link to="/shop" preload="intent" className="btn-art mt-6 min-h-12 text-sm tracking-wide sm:mt-8">
-              View All Works <ArrowUpRight className="size-4" aria-hidden="true" />
+      <section aria-labelledby="selected-works-heading" className="mx-auto max-w-[1400px] px-4 py-10 sm:px-10 md:py-20 lg:py-24">
+        <div className="mx-auto max-w-3xl text-center">
+          <p className="eyebrow">Selected works</p>
+          <h2 id="selected-works-heading" className="mt-2 text-4xl leading-[.92] sm:mt-4 sm:text-6xl">
+            From the <span className="text-accent">Atelier</span>
+          </h2>
+          <p className="mx-auto mt-4 max-w-2xl text-sm leading-relaxed text-muted-foreground sm:mt-6 sm:leading-7">
+            Atelier (pronounced ah-tell-YAY) is a French word meaning a creative workspace or studio devoted designers and artisans, develop and produce beautiful, distinctive things are imagined, created, and brought to life.
+          </p>
+          <div className="mt-8 flex justify-center sm:mt-10">
+            <Link to="/shop" preload="intent" className="btn-art justify-center">
+              View all works <ArrowUpRight className="h-4 w-4" />
             </Link>
           </div>
-          <CertificateStatement className="mt-4 justify-center gap-2 text-center text-xs leading-5 font-semibold tracking-wide text-forest [&>svg]:text-current sm:mt-5 lg:items-center lg:text-[11px] lg:tracking-normal lg:whitespace-nowrap lg:[&>svg]:mt-0 xl:text-xs xl:tracking-wide" />
         </div>
       </section>
 
@@ -214,8 +217,7 @@ function Index() {
           <h2 className="mx-auto mt-3 max-w-3xl text-4xl leading-[1.02] sm:mt-5 sm:text-6xl">Some stories are waiting{" "}<br className="hidden sm:block" /><em className="text-accent">to be made.</em></h2>
           <p className="mx-auto mt-3 max-w-lg text-sm leading-relaxed sm:mt-6 sm:leading-7 text-muted-foreground">Commission a bespoke work exclusively designed and created for you, a meaningful person or occasion, or for your private collection. We will contact you and set up a 15-minute, no-obligation discussion about your vision.</p>
           <div className="mt-5 flex flex-wrap justify-center gap-3 sm:mt-9">
-            <Link to="/contact" className="btn-art">Begin a bespoke inquiry <ArrowRight className="h-4 w-4" /></Link>
-            <Link to="/contact" className="btn-outline-art">Contact Us</Link>
+            <Link to="/contact" className="btn-art">Contact us <ArrowRight className="h-4 w-4" /></Link>
           </div>
         </div>
       </section>

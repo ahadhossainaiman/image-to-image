@@ -72,7 +72,7 @@ const creators: Creator[] = [
       <>
         <p>
           For Zev Amóre, a creative idea is the beginning of a conversation between imagination,
-          material, and feeling. This sample biography imagines an approach inspired by woodland
+          material, and feeling. This biography imagines an approach inspired by woodland
           shapes, unexpected textures, and the beauty of objects that reveal something new with every
           glance.
         </p>
@@ -160,7 +160,7 @@ function AboutTheArtists() {
             id={creator.id}
             aria-labelledby={`${creator.id}-name`}
             key={creator.id}
-            className="grid scroll-mt-20 gap-0 sm:scroll-mt-28 lg:grid-cols-[minmax(0,1fr)_var(--portrait-width)] lg:[--portrait-width:min(56.5cqw,max(24rem,calc(100svh_-_11.5rem)))] lg:[--portrait-height:calc(var(--portrait-width)_-_4rem)]"
+            className="grid scroll-mt-20 gap-0 sm:scroll-mt-28 lg:grid-cols-[minmax(0,1fr)_var(--portrait-width)] lg:[--portrait-width:56.5cqw] lg:[--portrait-height:min(calc((var(--portrait-width)_-_4rem)*966/1287),max(20rem,calc(100svh_-_15.5rem)))]"
           >
             {/* The extra height accounts for the figure frame, caption, and sticky scroll travel. */}
             <div className="relative border border-primary/25 bg-secondary px-4 py-5 text-foreground shadow-[0_24px_70px_-36px_rgba(0,0,0,0.5)] sm:p-7 md:p-12 lg:-mr-3 lg:min-h-[calc(var(--portrait-height)_+_11rem)] lg:py-16 lg:pr-16">
@@ -182,7 +182,7 @@ function AboutTheArtists() {
               </div>
               <div className="space-y-3 text-sm leading-relaxed md:space-y-5 md:leading-8 text-foreground/80">
                 <p className="text-[9px] uppercase tracking-[.2em] text-primary/80">
-                  {creator.sampleBiography ? "Sample biography" : "Biography"}
+                  {creator.sampleBiography ? "Biography" : "Biography"}
                 </p>
                 {creator.biography}
               </div>
@@ -200,12 +200,12 @@ function AboutTheArtists() {
                 aria-hidden="true"
                 className="absolute inset-x-0 bottom-0 top-0 md:bottom-14 border border-primary/30 lg:bottom-0"
               />
-              <div className="relative isolate aspect-square w-full overflow-hidden bg-forest">
+              <div className="relative isolate aspect-[1287/966] w-full overflow-hidden rounded-t-[45%] bg-forest lg:max-h-[var(--portrait-height)]">
                 <img
                   src={creator.image}
                   alt={creator.imageAlt}
                   loading="lazy"
-                  className="h-full w-full object-cover opacity-60"
+                  className="h-full w-full object-contain opacity-60"
                 />
                 <div
                   aria-hidden="true"

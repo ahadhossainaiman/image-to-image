@@ -1,21 +1,18 @@
-export const storeCurrency = "USD";
+type Price = { price: number | null; currency?: string | undefined };
 
-const usdFormatter = new Intl.NumberFormat("en-US", {
-  style: "currency",
-  currency: storeCurrency,
-  minimumFractionDigits: 0,
-  maximumFractionDigits: 2,
-});
-
-export function isUsd(currency: string | null | undefined) {
-  return currency?.trim().toUpperCase() === storeCurrency;
+export function catalogPrice(item: Price) {
+  const currency = item.currency?.trim().toUpperCase();
+  return currency && /^[A-Z]{3}$/.test(currency) && item.price != null && Number.isFinite(item.price) && item.price >= 0
+    ? { amount: item.price, currency }
+    : null;
 }
 
-export function usdPrice(item: { price: number | null; currency?: string | undefined }) {
-  return isUsd(item.currency) && item.price != null && Number.isFinite(item.price) ? item.price : null;
-}
-
-export function formatPrice(item: { price: number | null; currency?: string | undefined }) {
-  const price = usdPrice(item);
-  return price == null ? "" : usdFormatter.format(price);
+export function formatPrice(item: Price) {
+  const price = catalogPrice(item);
+  if (!price) return "";
+  return new Intl.NumberFormat("en-US", {
+    style: "currency",
+    currency: price.currency,
+    minimumFractionDigits: 0,
+  }).format(price.amount);
 }

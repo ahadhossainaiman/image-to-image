@@ -1,11 +1,11 @@
 import { useSyncExternalStore } from "react";
-import { wixClient, isWixConfigured, ensureVisitorTokens } from "@/lib/wix/client";
+import { wixClient, isWixConfigured, ensureVisitorTokens, saveWixTokens } from "@/lib/wix/client";
 import { formatWixImageUrl } from "@/lib/wix/types";
+import { WIX_STORES_APP_ID } from "@/lib/wix/cart";
 import type { Artwork } from "@/data/catalog";
 import { formatPrice } from "@/lib/currency";
 import { setCartDrawerOpen } from "@/lib/cart-drawer";
 
-const WIX_STORES_APP_ID = "1380b703-ce81-ff05-f115-39571d94dfcd";
 const KEY = "thoa-cart";
 const DETAILS_KEY = "thoa-cart-details";
 
@@ -28,6 +28,7 @@ let items: CartItem[] = [];
 type StoredCartDetail = Omit<CartItemDetail, "formattedPrice">;
 let detailsMap = new Map<string, StoredCartDetail>();
 let loaded = false;
+let cartQueue: Promise<unknown> = Promise.resolve();
 const subs = new Set<() => void>();
 
 function notify() {
@@ -53,7 +54,7 @@ function load() {
     }
 
     if (isWixConfigured()) {
-      syncCartWithWix().catch(() => {});
+      cartQueue = syncCartWithWix();
     }
   }
 }
@@ -85,18 +86,22 @@ export async function syncCartWithWix(): Promise<void> {
   try {
     await ensureVisitorTokens();
     const serverCart = await wixClient.currentCart.getCurrentCart();
+    saveWixTokens(wixClient.auth.getTokens());
 
     if (serverCart && serverCart.lineItems) {
       const nextItems: CartItem[] = [];
-      serverCart.lineItems.forEach((li: any) => {
-        const catalogItemId = li.catalogReference?.catalogItemId || li._id || "";
-        const slug = catalogItemId;
+      const nextDetails = new Map<string, StoredCartDetail>();
+      const knownSlugs = new Map([...detailsMap.values()].map((item) => [item.productId, item.slug]));
+      serverCart.lineItems.forEach((li) => {
+        const catalogItemId = li.catalogReference?.catalogItemId;
+        if (!catalogItemId || !li._id) return;
+        const slug = knownSlugs.get(catalogItemId) ?? catalogItemId;
         const rawPrice = li.price?.amount ? parseFloat(li.price.amount) : null;
         const title = li.productName?.original ?? "";
         const image = formatWixImageUrl(li.image);
 
         nextItems.push({ slug, qty: 1 });
-        detailsMap.set(slug, {
+        nextDetails.set(slug, {
           slug,
           lineItemId: li._id,
           productId: catalogItemId,
@@ -110,6 +115,7 @@ export async function syncCartWithWix(): Promise<void> {
       });
 
       items = nextItems;
+      detailsMap = nextDetails;
       localStorage.setItem(KEY, JSON.stringify(items));
       saveDetails();
     }
@@ -166,80 +172,77 @@ export function useCartDetails(): CartItemDetail[] {
 /**
  * Adds an artwork to the active cart. Capped at 1 copy (one of a kind).
  */
-export const addToCart = (artworkOrSlug: string | (Pick<Artwork, "slug"> & Partial<Pick<Artwork, "title" | "price" | "currency" | "reference" | "images">>)) => {
+type CartArtwork = Pick<Artwork, "slug"> & Partial<Pick<Artwork, "wixProductId" | "title" | "price" | "currency" | "reference" | "images">>;
+
+export function addToCart(artworkOrSlug: string | CartArtwork): Promise<boolean> {
   load();
-  const slug = typeof artworkOrSlug === "string" ? artworkOrSlug : artworkOrSlug.slug;
-  if (!slug) return;
+  const artwork = typeof artworkOrSlug === "string" ? { slug: artworkOrSlug } : artworkOrSlug;
+  const { slug } = artwork;
+  if (!slug) return Promise.resolve(false);
 
-  if (!items.some((i) => i.slug === slug)) {
-    set([...items, { slug, qty: 1 }]);
-
-    if (typeof artworkOrSlug !== "string") {
-      const title = artworkOrSlug.title ?? "";
-      const price = artworkOrSlug.price ?? null;
-      const image = artworkOrSlug.images?.[0]?.src || "";
-      const reference = artworkOrSlug.reference ?? "";
-
-      detailsMap.set(slug, {
-        slug,
-        productId: (artworkOrSlug as any).id || slug,
-        title,
-        reference,
-        price,
-        currency: artworkOrSlug.currency,
-        image,
-        qty: 1,
-      });
-      saveDetails();
-    }
-
-    // Sync with Wix eCommerce in background
-    if (isWixConfigured() && typeof window !== "undefined") {
-      (async () => {
-        try {
-          await ensureVisitorTokens();
-          let catalogItemId = typeof artworkOrSlug !== "string" && (artworkOrSlug as any).id ? (artworkOrSlug as any).id : slug;
-
-          if (!catalogItemId.includes("-") || catalogItemId.length < 20) {
-            try {
-              const productQuery = await wixClient.products.queryProducts().eq("slug", slug).limit(1).find();
-              if (productQuery.items?.[0]?._id) {
-                catalogItemId = productQuery.items[0]._id;
-              }
-            } catch {}
-          }
-
-          const res = await wixClient.currentCart.addToCurrentCart({
-            lineItems: [
-              {
-                catalogReference: {
-                  appId: WIX_STORES_APP_ID,
-                  catalogItemId,
-                },
-                quantity: 1,
-              },
-            ],
-          });
-
-          if (res?.cart?.lineItems) {
-            const added = res.cart.lineItems.find((li: any) => li.catalogReference?.catalogItemId === catalogItemId);
-            if (added) {
-              const existing = detailsMap.get(slug);
-              if (existing) {
-                if (added._id) existing.lineItemId = added._id;
-                existing.productId = catalogItemId;
-                saveDetails();
-              }
-            }
-          }
-        } catch (err) {
-          console.warn("Wix Headless: add to cart sync warning:", err);
-        }
-      })();
-    }
+  function saveItem(detail: Partial<StoredCartDetail> = {}) {
+    detailsMap.set(slug, {
+      slug,
+      title: artwork.title ?? "",
+      reference: artwork.reference ?? "",
+      price: artwork.price ?? null,
+      currency: artwork.currency,
+      image: artwork.images?.[0]?.src ?? "",
+      qty: 1,
+      ...detail,
+    });
+    set([...items.filter((item) => item.slug !== slug), { slug, qty: 1 }]);
+    saveDetails();
   }
-  setCartDrawerOpen(true);
-};
+
+  if (!isWixConfigured() || typeof window === "undefined") {
+    if (!items.some((item) => item.slug === slug)) saveItem();
+    setCartDrawerOpen(true);
+    return Promise.resolve(true);
+  }
+
+  const operation = cartQueue.then(async () => {
+    let productId = artwork.wixProductId || detailsMap.get(slug)?.productId;
+    const inWixCart = () => items.some((item) => {
+      const detail = detailsMap.get(item.slug);
+      return Boolean(detail?.lineItemId && (item.slug === slug || (productId && detail.productId === productId)));
+    });
+
+    try {
+      if (!inWixCart()) {
+        await ensureVisitorTokens();
+        if (!productId) {
+          const result = await wixClient.products.queryProducts().eq("slug", slug).limit(1).find();
+          productId = result.items[0]?._id;
+        }
+        if (!productId) return false;
+        if (!inWixCart()) {
+          const result = await wixClient.currentCart.addToCurrentCart({
+            lineItems: [{ catalogReference: { appId: WIX_STORES_APP_ID, catalogItemId: productId }, quantity: 1 }],
+          });
+          const line = result.cart?.lineItems?.find((item) => item.catalogReference?.catalogItemId === productId);
+          if (!line?._id) throw new Error("Wix did not return the added line item.");
+          saveWixTokens(wixClient.auth.getTokens());
+          const amount = Number.parseFloat(line.price?.amount ?? "");
+          saveItem({
+            lineItemId: line._id,
+            productId,
+            ...(Number.isFinite(amount) && { price: amount, currency: result.cart?.currency ?? artwork.currency }),
+          });
+        }
+      }
+    } catch (error) {
+      console.warn("Wix Headless: Could not add the product to the cart:", error);
+      await syncCartWithWix();
+      if (!inWixCart()) return false;
+    }
+
+    setCartDrawerOpen(true);
+    return true;
+  });
+  cartQueue = operation.catch(() => {});
+  return operation;
+}
 
 /**
  * Removes an artwork from the active cart.

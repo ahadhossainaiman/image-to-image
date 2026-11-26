@@ -27,6 +27,7 @@ export type ArtworkMedia = ArtworkImage | { src: string; alt: string; name?: str
 
 export type Artwork = {
   slug: string;
+  wixProductId?: string;
   title: string;
   reference: string;
   category: string;
@@ -41,15 +42,36 @@ export type Artwork = {
   images: ArtworkImage[];
   wixDetails?: {
     gallery: ArtworkMedia[];
+    descriptionHtml?: string;
     sku: string;
     brand: string;
     ribbons: string[];
     stockLabel: string;
+    productType?: string;
+    requiresPurchaseOptions?: boolean;
     dimensions: string;
+    packageDimensions: string;
+    weight?: number;
+    stockQuantity?: number;
+    regularPrice: string;
+    priceRange: string;
     unitPrice: string;
-    sections: { title: string; text: string }[];
+    unitQuantity: string;
+    sections: { title: string; text: string; html?: string }[];
     options: { name: string; choices: string[] }[];
-    customizationLabels: string[];
+    variants: {
+      name: string;
+      price: string;
+      regularPrice: string;
+      unitPrice: string;
+      sku: string;
+      dimensions: string;
+      packageDimensions: string;
+      weight?: number;
+      stockLabel: string;
+      stockQuantity?: number;
+    }[];
+    customizations: { title: string; mandatory?: boolean; maxLength?: number }[];
   };
   published: boolean;
 };

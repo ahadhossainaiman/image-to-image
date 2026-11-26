@@ -6,8 +6,8 @@ describe("gallery rules", () => {
     expect(formatPrice({ price: 100.75, currency: "USD" })).toBe("$100.75");
   });
 
-  it("does not display a non-USD amount as a US dollar price", () => {
-    expect(formatPrice({ price: 280, currency: "BDT" })).toBe("");
+  it("uses the catalog currency without relabeling the amount as USD", () => {
+    expect(formatPrice({ price: 280, currency: "BDT" })).toMatch(/BDT\s*280/);
   });
 
   it("omits a price when Wix did not send an amount or currency", () => {

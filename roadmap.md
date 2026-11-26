@@ -1,6 +1,7 @@
 # Roadmap
 
 - [x] Apply the uploaded wording, tagline and authenticity updates without redesigning existing pages.
+- [x] Update homepage Atelier section: remove product cards and authenticity statement, center-align text, style "From the Atelier" with capitalized yellow Atelier, update the atelier description, and center the "View all works" button at the bottom.
 - [x] Add Alba and Zev Amore artist spaces and the inquiry phone field.
 - [x] Verify wording, every artwork page and draft saving across desktop, tablet and mobile.
 - [ ] Artist photographs and biographies await client-provided content; Instagram placement and functionality await client confirmation.

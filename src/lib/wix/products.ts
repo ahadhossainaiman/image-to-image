@@ -1,6 +1,7 @@
 import { wixClient, isWixConfigured } from "./client";
 import { mapWixProductToArtwork, mapWixCollectionToCategory } from "./types";
 import type { Artwork, Category } from "@/data/catalog";
+import type { products } from "@wix/stores";
 
 const collectionOrder = new Map([
   ["the queen collection", 0],
@@ -31,6 +32,22 @@ async function collectQueryItems<T>(page: WixQueryPage<T>): Promise<T[]> {
   return items;
 }
 
+function orderMushroomArtworks(artworks: Artwork[]): Artwork[] {
+  const numbered = artworks.flatMap((artwork, index) => {
+    const code = [artwork.reference, artwork.slug, artwork.title]
+      .map((value) => /^mush[\s-]*(\d+)$/i.exec(value.trim()))
+      .find(Boolean);
+    return code ? [{ artwork, index, number: Number(code[1]) }] : [];
+  });
+  const sorted = [...numbered].sort((a, b) => a.number - b.number);
+  const ordered = [...artworks];
+  // Keep other collections' works in their Wix positions in the combined gallery.
+  numbered.forEach(({ index }, position) => {
+    ordered[index] = sorted[position]!.artwork;
+  });
+  return ordered;
+}
+
 /**
  * Fetches all published artworks.
  */
@@ -42,9 +59,29 @@ export async function getArtworks(): Promise<Artwork[]> {
   try {
     const firstPage = await wixClient.products.queryProducts().limit(100).find();
     const items = await collectQueryItems(firstPage);
-    return items.filter(Boolean).map(mapWixProductToArtwork).filter((a) => a.published);
+    return orderMushroomArtworks(items.filter(Boolean).map(mapWixProductToArtwork).filter((a) => a.published));
   } catch (error) {
     console.warn("Wix Headless: Failed to query products:", error);
+    return [];
+  }
+}
+
+/** Fetches the three most recently created public works for the homepage. */
+export async function getLatestArtworks(): Promise<Artwork[]> {
+  if (!isWixConfigured()) return [];
+
+  const limit = 3;
+  try {
+    let page = await wixClient.products.queryProducts().descending("numericId").limit(limit).find();
+    const artworks: Artwork[] = [];
+    for (;;) {
+      const published = page.items.filter(Boolean).map(mapWixProductToArtwork).filter((artwork) => artwork.published);
+      artworks.push(...published.slice(0, limit - artworks.length));
+      if (artworks.length === limit || !page.hasNext()) return artworks;
+      page = await page.next();
+    }
+  } catch (error) {
+    console.warn("Wix Headless: Failed to query the latest products:", error);
     return [];
   }
 }
@@ -59,19 +96,27 @@ export async function getArtworkBySlug(slug: string): Promise<Artwork | undefine
 
   try {
     const response = await wixClient.products.queryProducts().eq("slug", slug).limit(1).find();
-    const firstBySlug = response.items?.[0];
-    if (firstBySlug) {
-      return mapWixProductToArtwork(firstBySlug);
+    const product = response.items?.[0] ??
+      (await wixClient.products.queryProducts().eq("_id", slug).limit(1).find()).items?.[0];
+    if (!product) return undefined;
+
+    if (product._id && product.visible !== false && product.manageVariants && !product.variants?.length) {
+      try {
+        const variants: NonNullable<products.Product["variants"]> = [];
+        const limit = 100;
+        for (let offset = 0; ; offset += limit) {
+          const page = await wixClient.products.queryProductVariants(product._id, { paging: { limit, offset } });
+          const batch = page.variants ?? [];
+          variants.push(...batch);
+          if (batch.length < limit || (page.totalResults != null && variants.length >= page.totalResults)) break;
+        }
+        return mapWixProductToArtwork({ ...product, variants });
+      } catch (error) {
+        console.warn(`Wix Headless: Error fetching variants for '${slug}':`, error);
+      }
     }
 
-    // Try finding by _id in case slug was an ID
-    const byIdResponse = await wixClient.products.queryProducts().eq("_id", slug).limit(1).find();
-    const firstById = byIdResponse.items?.[0];
-    if (firstById) {
-      return mapWixProductToArtwork(firstById);
-    }
-
-    return undefined;
+    return mapWixProductToArtwork(product);
   } catch (error) {
     console.warn(`Wix Headless: Error fetching product '${slug}':`, error);
     return undefined;
@@ -146,7 +191,8 @@ export async function getArtworksByCategory(category: Category): Promise<Artwork
         .hasSome("collectionIds", [category.wixCollectionId])
         .limit(100)
         .find();
-      return (await collectQueryItems(prodResponse)).filter(Boolean).map(mapWixProductToArtwork).filter((a) => a.published);
+      const artworks = (await collectQueryItems(prodResponse)).filter(Boolean).map(mapWixProductToArtwork).filter((a) => a.published);
+      return category.slug === "the-mushroom-woodlands-1" ? orderMushroomArtworks(artworks) : artworks;
     } catch (error) {
       console.warn(`Wix Headless: Error fetching artworks for category '${category.slug}':`, error);
     }

@@ -1,6 +1,8 @@
 import { act, renderHook } from "@testing-library/react";
-import { afterEach, describe, expect, it } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 import { addToCart, removeFromCart, useCart } from "@/lib/cart";
+
+vi.mock("@/lib/wix/client", () => ({ isWixConfigured: () => false }));
 
 const slug = "sample-celestial-angel";
 

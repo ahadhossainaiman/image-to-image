@@ -23,7 +23,7 @@ export const seoPages = {
     type: "AboutPage",
   },
   "/contact": {
-    title: "Bespoke Art Commissions & Inquiries | Thy House Of Art",
+    title: "Bespoke Art Commissions & Enquiries | Thy House Of Art",
     description: "Contact Thy House Of Art about acquiring an original piece or commissioning a bespoke handmade artwork for a collection, gift or special occasion.",
     type: "ContactPage",
   },

@@ -1,17 +1,11 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useMemo, useState, type ReactNode } from "react";
-import { ChevronDown, SlidersHorizontal } from "lucide-react";
+import { useMemo, useState } from "react";
+import { SlidersHorizontal } from "lucide-react";
 import { getArtworks, getCategories } from "@/lib/wix";
 import { ArtCardGrid } from "@/components/ArtCardGrid";
 import { CatalogLoading } from "@/components/CatalogLoading";
 import { getPageHead } from "@/lib/seo";
-import { usdPrice } from "@/lib/currency";
-
-const availabilityOptions = [
-  { value: "all", label: "All" },
-  { value: "available", label: "Available" },
-  { value: "request", label: "Price on request" },
-];
+import { catalogPrice } from "@/lib/currency";
 
 export const Route = createFileRoute("/shop")({
   pendingComponent: () => <CatalogLoading page="shop" />,
@@ -30,29 +24,6 @@ export const Route = createFileRoute("/shop")({
   component: Shop,
 });
 
-function FilterSelect({ label, value, onChange, children }: {
-  label: string;
-  value: string;
-  onChange: (value: string) => void;
-  children: ReactNode;
-}) {
-  return (
-    <label className="grid min-w-0 gap-1.5">
-      <span className="text-sm font-medium text-muted-foreground">{label}</span>
-      <span className="relative min-w-0">
-        <select
-          className="block min-h-11 w-full appearance-none truncate border border-primary/40 bg-background/70 py-2 pr-9 pl-3 text-base font-normal text-foreground [color-scheme:dark] focus-visible:border-primary focus-visible:outline-1 focus-visible:outline-primary"
-          value={value}
-          onChange={(event) => onChange(event.currentTarget.value)}
-        >
-          {children}
-        </select>
-        <ChevronDown aria-hidden="true" className="pointer-events-none absolute top-1/2 right-3 size-4 -translate-y-1/2 text-primary" />
-      </span>
-    </label>
-  );
-}
-
 function Shop() {
   const { artworks, categories } = Route.useLoaderData();
   const [categorySlug, setCategorySlug] = useState<string | null>(null);
@@ -67,12 +38,12 @@ function Shop() {
       if (!belongsToCollection) return false;
     }
     if (availability === "available" && artwork.availability !== "available") return false;
-    if (availability === "request" && usdPrice(artwork) != null) return false;
+    if (availability === "request" && catalogPrice(artwork)) return false;
     return true;
   }), [artworks, selectedCategory, availability]);
 
   return (
-    <div className="mx-auto max-w-[1600px] px-4 pt-8 pb-4 sm:px-8 md:pt-14 md:pb-14 lg:pt-20">
+    <div className="mx-auto max-w-[1500px] px-4 pt-8 pb-4 sm:px-10 md:pt-16 md:pb-16 lg:pt-24">
       <header className="grid gap-3 border-b border-border pb-5 md:gap-8 md:pb-12 lg:grid-cols-[1.2fr_.8fr] lg:items-end">
         <div>
           <p className="eyebrow">The gallery</p>
@@ -81,29 +52,17 @@ function Shop() {
         <p className="max-w-md text-sm leading-relaxed text-muted-foreground md:leading-7 lg:justify-self-end">Each piece is made once, by hand. Enter a collection to discover its textures, details and story.</p>
       </header>
 
-      <section className="glass-panel mt-4 p-3.5 sm:p-6 md:mt-10" aria-label="Gallery filters">
-        <div className="flex items-center gap-2.5 border-b border-border pb-2.5 lg:gap-3 lg:pb-5">
-          <SlidersHorizontal aria-hidden="true" className="size-4 text-primary" strokeWidth={1.2} />
-          <p className="text-sm font-medium text-foreground lg:font-normal lg:uppercase lg:tracking-[.2em] lg:text-muted-foreground">Curate your view</p>
-        </div>
-        <div className="mt-3 grid gap-3 min-[30rem]:grid-cols-2 lg:hidden">
-          <FilterSelect label="Collection" value={selectedCategory?.slug ?? ""} onChange={(slug) => setCategorySlug(slug || null)}>
-            <option value="">All works</option>
-            {categories.map((item) => <option key={item.slug} value={item.slug}>{item.shortName}</option>)}
-          </FilterSelect>
-          <FilterSelect label="Availability" value={availability} onChange={setAvailability}>
-            {availabilityOptions.map(({ value, label }) => <option key={value} value={value}>{label}</option>)}
-          </FilterSelect>
-        </div>
-        <div className="mt-5 hidden grid-cols-[1fr_auto] gap-6 lg:grid">
+      <section className="glass-panel mt-4 p-3 sm:p-6 md:mt-10" aria-label="Gallery filters">
+        <div className="flex items-center gap-3 border-b border-border pb-3 md:pb-5"><SlidersHorizontal className="h-4 w-4 text-primary" strokeWidth={1.2} /><p className="text-[10px] uppercase tracking-[.2em] text-muted-foreground">Curate your view</p></div>
+        <div className="mt-3 grid gap-4 md:mt-5 md:gap-6 lg:grid-cols-[1fr_auto]">
           <div>
-            <p className="mb-2 text-sm md:mb-3 uppercase tracking-[.2em] text-muted-foreground">By collection & medium</p>
+            <p className="mb-2 text-[9px] md:mb-3 uppercase tracking-[.2em] text-muted-foreground">By collection & medium</p>
             <div className="flex flex-wrap gap-2">
-              <button className="filter-pill text-sm" data-active={!selectedCategory} aria-pressed={!selectedCategory} onClick={() => setCategorySlug(null)}>All works</button>
+              <button className="filter-pill" data-active={!selectedCategory} aria-pressed={!selectedCategory} onClick={() => setCategorySlug(null)}>All works</button>
               {categories.map((item) => (
                 <button
                   key={item.slug}
-                  className="filter-pill text-sm"
+                  className="filter-pill"
                   data-active={selectedCategory === item}
                   aria-pressed={selectedCategory === item}
                   onClick={() => setCategorySlug(item.slug)}
@@ -114,21 +73,19 @@ function Shop() {
             </div>
           </div>
           <div>
-            <p className="mb-2 text-sm md:mb-3 uppercase tracking-[.2em] text-muted-foreground">Availability</p>
+            <p className="mb-2 text-[9px] md:mb-3 uppercase tracking-[.2em] text-muted-foreground">Availability</p>
             <div className="flex flex-wrap gap-2">
-              {availabilityOptions.map(({ value, label }) => (
-                <button key={value} className="filter-pill text-sm" data-active={availability === value} aria-pressed={availability === value} onClick={() => setAvailability(value)}>
-                  {label}
-                </button>
-              ))}
+              <button className="filter-pill" data-active={availability === "all"} onClick={() => setAvailability("all")}>All</button>
+              <button className="filter-pill" data-active={availability === "available"} onClick={() => setAvailability("available")}>Available</button>
+              <button className="filter-pill" data-active={availability === "request"} onClick={() => setAvailability("request")}>Price on request</button>
             </div>
           </div>
         </div>
       </section>
 
       <div className="mt-5 flex md:mt-12 items-center justify-between">
-        <p className="text-xs text-muted-foreground lg:text-sm" aria-live="polite">Showing {filtered.length} {filtered.length === 1 ? "work" : "works"}</p>
-        <p className="hidden text-[9px] uppercase tracking-[.2em] text-primary sm:block lg:text-sm">Every artwork is one of one</p>
+        <p className="text-xs text-muted-foreground" aria-live="polite">Showing {filtered.length} {filtered.length === 1 ? "work" : "works"}</p>
+        <p className="hidden text-[9px] uppercase tracking-[.2em] text-primary sm:block">Every artwork is one of one</p>
       </div>
       {filtered.length > 0 ? (
         <ArtCardGrid artworks={filtered} />

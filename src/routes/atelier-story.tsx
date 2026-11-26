@@ -12,12 +12,12 @@ export const Route = createFileRoute("/atelier-story")({
 function AtelierStory() {
   return (
     <>
-      <section className="mx-auto grid max-w-[1400px] items-center gap-5 px-4 pt-8 pb-4 sm:px-10 md:gap-14 md:py-16 lg:grid-cols-[1fr_.9fr] lg:py-24">
+      <section className="mx-auto grid max-w-[1400px] items-start gap-5 px-4 pt-8 pb-4 sm:px-10 md:gap-14 md:py-16 lg:grid-cols-[1fr_.9fr] lg:py-24">
         <div>
           <p className="eyebrow">The atelier story</p>
           <h1 className="mt-3 text-5xl md:mt-6 leading-[.95] sm:text-7xl lg:text-8xl">A house of<br /><em className="text-accent">wonder.</em></h1>
-          <p className="mt-4 max-w-xl font-display text-xl md:mt-8 md:text-2xl italic leading-snug text-foreground">Where angels and fairies live — and where the smallest handmade details become lasting emotional treasures.</p>
-          <p className="mt-3 max-w-xl text-sm leading-relaxed md:mt-7 md:leading-7 text-muted-foreground">Thy House Of Art is an independent art studio devoted to one-of-a-kind handmade creations. Our world brings together celestial figures, botanical imagination and the meditative artistry of embroidery.</p>
+          <p className="mt-4 max-w-xl font-display text-xl md:mt-8 md:text-2xl italic leading-snug text-foreground"> Atelier (pronounced <em>ah-tell-YAY</em>) is a French word meaning a creative workspace or studio where designers and artisans imagine, develop, and bring beautiful, distinctive things to life.</p>
+          <p className="mt-5 max-w-xl text-sm leading-relaxed md:mt-10 md:leading-7 text-muted-foreground">Thy House Of Art is an independent art studio devoted to one-of-a-kind handmade creations. Our world brings together celestial figures, botanical imagination and the meditative artistry of embroidery.</p>
           <p className="mt-2 max-w-xl text-sm leading-relaxed md:mt-4 md:leading-7 text-muted-foreground">Every piece is shaped, stitched and finished individually. No moulded editions, no repeated works: only singular objects with their own presence, provenance and story.</p>
         </div>
         <div className="glass-panel relative p-2 md:p-3">

@@ -1,16 +1,17 @@
 import { Link } from "@tanstack/react-router";
 import { createPortal } from "react-dom";
-import { useEffect, useState, type FormEvent } from "react";
-import { ArrowRight, Instagram, LockKeyhole, Menu, ShoppingBag, X } from "lucide-react";
+import { useEffect, useRef, useState, type FormEvent } from "react";
+import { ArrowRight, Instagram, LockKeyhole, Menu, ShoppingCart, X } from "lucide-react";
 import { useCart } from "@/lib/cart";
 import { CartDrawer } from "@/components/CartDrawer";
+import { requestNewsletterSignup } from "@/lib/wix/newsletter";
 
 const nav = [
   { to: "/", label: "Home" },
   { to: "/shop", label: "Collections" },
   { to: "/atelier-story", label: "Atelier Story" },
   { to: "/about-the-artists", label: "About The Artists" },
-  { to: "/contact", label: "Contact Us" },
+  { to: "/contact", label: "Bespoke enquiry" },
 ] as const;
 
 function Brand({ logoClassName = "h-auto w-30 sm:w-38" }: { logoClassName?: string }) {
@@ -42,7 +43,7 @@ export function SiteHeader() {
               key={item.to}
               to={item.to}
               preload={item.to === "/shop" ? "intent" : false}
-              className="text-xs uppercase tracking-[.2em] text-muted-foreground transition-colors hover:text-accent"
+              className="text-[10px] uppercase tracking-[.2em] text-muted-foreground transition-colors hover:text-accent"
               activeProps={{ className: "text-accent" }}
               activeOptions={{ exact: item.to === "/" }}
             >
@@ -52,9 +53,12 @@ export function SiteHeader() {
         </nav>
         <div className="flex shrink-0 items-center gap-1 sm:gap-4">
           <CartDrawer>
-            <button aria-label={`Open shopping cart with ${cart.length} items`} className="relative flex size-11 sm:size-10 items-center justify-center rounded-full transition-colors hover:bg-primary/10">
-              <ShoppingBag className="h-[18px] w-[18px]" strokeWidth={1.15} />
-              {cart.length > 0 && <span className="absolute right-0 top-0 flex h-4 min-w-4 items-center justify-center rounded-full bg-primary px-1 text-[9px] text-primary-foreground">{cart.length}</span>}
+            <button type="button" aria-label={`Open shopping cart with ${cart.length} ${cart.length === 1 ? "item" : "items"}`} className="flex h-11 cursor-pointer items-end gap-1 px-2.5 pb-2 text-accent transition-colors hover:text-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent sm:h-12 sm:px-3.5">
+              <span aria-hidden="true" className="relative h-8 w-8 shrink-0">
+                <ShoppingCart className="absolute inset-x-0 bottom-0 h-7 w-8" strokeWidth={2.3} />
+                <span className="absolute top-0 right-0.5 px-0.5 text-xs leading-none font-bold tabular-nums">{cart.length}</span>
+              </span>
+              <span aria-hidden="true" className="pb-0.5 text-xs leading-none font-normal">Cart</span>
             </button>
           </CartDrawer>
           <button className="flex size-11 items-center justify-center lg:hidden" aria-label="Open menu" onClick={() => setOpen(true)}>
@@ -95,10 +99,33 @@ export function SiteHeader() {
 }
 
 export function SiteFooter() {
-  const [newsletterNote, setNewsletterNote] = useState("");
-  function handleNewsletter(event: FormEvent<HTMLFormElement>) {
+  const [signup, setSignup] = useState<"idle" | "sending" | "confirmed" | "pending" | "error">("idle");
+  const signingUp = useRef(false);
+
+  useEffect(() => {
+    if (signup !== "confirmed" && signup !== "pending") return;
+    const timeout = window.setTimeout(() => setSignup("idle"), 3000);
+    return () => window.clearTimeout(timeout);
+  }, [signup]);
+
+  async function handleNewsletter(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    setNewsletterNote("Collector notes are coming soon. Please use Bespoke Inquiry for a private introduction.");
+    if (signingUp.current || signup === "pending") return;
+    const form = event.currentTarget;
+    const email = String(new FormData(form).get("collector-email") ?? "").trim();
+    if (!email) return;
+
+    signingUp.current = true;
+    setSignup("sending");
+    try {
+      const result = await requestNewsletterSignup(email);
+      form.reset();
+      setSignup(result);
+    } catch {
+      setSignup("error");
+    } finally {
+      signingUp.current = false;
+    }
   }
 
   return (
@@ -129,12 +156,21 @@ export function SiteFooter() {
           <div>
             <p className="eyebrow">Collector notes</p>
             <p className="mt-2 font-display text-2xl md:mt-5 md:text-3xl leading-tight">New works, private previews{" "}<br className="hidden md:block" />and stories from the atelier.</p>
-            <form className="mt-2 flex border-b md:mt-6 border-primary/35" onSubmit={handleNewsletter} autoComplete="off">
+            <form className="mt-2 flex border-b md:mt-6 border-primary/35" onSubmit={handleNewsletter} onChange={() => {
+              if (signup === "error") setSignup("idle");
+            }}>
               <label className="sr-only" htmlFor="collector-email">Email address</label>
-              <input id="collector-email" name="collector-email" type="email" autoComplete="off" suppressHydrationWarning required placeholder="Your email address" className="min-w-0 flex-1 bg-transparent py-3 text-base md:py-4 md:text-sm text-foreground outline-none placeholder:text-muted-foreground" />
-              <button className="flex items-center gap-2 pl-4 text-[10px] uppercase tracking-[.18em] text-primary hover:text-accent">Join <ArrowRight className="h-4 w-4" /></button>
+              <input id="collector-email" name="collector-email" type="email" autoComplete="email" suppressHydrationWarning required readOnly={signup === "sending"} placeholder="Your email address" className="min-w-0 flex-1 bg-transparent py-3 text-base md:py-4 md:text-sm text-foreground outline-none placeholder:text-muted-foreground" />
+              <button type="submit" disabled={signup === "sending" || signup === "pending"} className="flex items-center gap-2 pl-4 text-[10px] uppercase tracking-[.18em] text-primary hover:text-accent disabled:opacity-50">
+                {signup === "sending" ? "Sending…" : "Subscribe"} <ArrowRight aria-hidden="true" className="h-4 w-4" />
+              </button>
             </form>
-            {newsletterNote && <p className="mt-3 text-xs leading-relaxed text-muted-foreground" role="status">{newsletterNote}</p>}
+            {(signup === "confirmed" || signup === "pending") && (
+              <p className="mt-3 text-xs leading-relaxed text-accent" role="status">
+                {signup === "confirmed" ? "Thank you. Your signup request has been submitted." : "Thank you. We received your signup request."}
+              </p>
+            )}
+            {signup === "error" && <p className="mt-3 text-xs leading-relaxed text-accent" role="alert">We couldn’t submit your signup request. Please try again.</p>}
           </div>
         </div>
         <div className="mt-5 flex flex-col gap-2 border-t border-border pt-3 md:mt-16 md:gap-4 md:pt-7 text-[9px] uppercase tracking-[.18em] text-muted-foreground sm:flex-row sm:items-center sm:justify-between">

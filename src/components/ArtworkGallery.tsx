@@ -36,7 +36,7 @@ export function ArtworkGallery({ items }: { items: ArtworkMedia[] }) {
   }
 
   return (
-    <div className="mx-auto w-[calc(100%_-_2.5rem)] min-w-0 max-w-80 md:w-full md:max-w-[38rem]">
+    <div className="mx-auto w-full min-w-0 max-w-80 md:max-w-none">
       <div
         ref={galleryRef}
         onScroll={(event) => {
@@ -45,7 +45,7 @@ export function ArtworkGallery({ items }: { items: ArtworkMedia[] }) {
             setActiveIndex(Math.max(0, Math.min(items.length - 1, Math.round(scrollLeft / clientWidth))));
           }
         }}
-        className="flex snap-x snap-mandatory overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden md:flex-col md:gap-8 md:overflow-visible"
+        className="flex snap-x snap-mandatory overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden md:flex-col md:gap-6 md:overflow-visible"
       >
         {items.map((item, index) => (
           <figure key={item.src} className="flex w-full shrink-0 snap-center flex-col justify-center md:glass-panel md:block md:p-3">
@@ -88,7 +88,7 @@ export function ArtworkGallery({ items }: { items: ArtworkMedia[] }) {
       </div>
 
       {items.length > 1 && (
-        <div className="mt-4 border-t border-border pt-3 md:hidden" role="group" aria-label="Artwork media navigation">
+        <div className="mt-3 border-t border-border pt-3 md:hidden" role="group" aria-label="Artwork media navigation">
           <p className="text-xs font-medium text-foreground">{mediaCount}</p>
           <div
             ref={thumbnailsRef}

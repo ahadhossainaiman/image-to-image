@@ -27,7 +27,12 @@ export function ArtworkLightbox({ image, title, children }: { image: ArtworkImag
       <DialogTrigger asChild>{children}</DialogTrigger>
       <DialogContent
         aria-describedby={undefined}
-        className="block w-max max-w-none bg-card p-(--photo-padding) [--photo-padding:0.625rem] [&>button]:grid [&>button]:size-11 [&>button]:place-items-center [&>button]:rounded-full [&>button]:bg-black/75 [&>button]:text-white [&>button]:opacity-100 [&>button]:ring-offset-transparent"
+        className="w-max max-w-none gap-0 rounded-md border-primary/50 bg-card p-[var(--frame-padding)] shadow-2xl
+          [--frame-padding:8px] [--frame-margin:8px] sm:[--frame-padding:12px] sm:[--frame-margin:16px]
+          [--image-inset:calc((var(--frame-margin)_+_var(--frame-padding)_+_1px)_*_2)]
+          [&>button]:right-[calc(var(--frame-padding)_+_6px)] [&>button]:top-[calc(var(--frame-padding)_+_6px)]
+          [&>button]:grid [&>button]:size-11 [&>button]:place-items-center [&>button]:rounded-full [&>button]:opacity-100
+          [&>button[data-state=open]]:bg-black/75 [&>button[data-state=open]]:text-white"
       >
         <DialogTitle className="sr-only">{title}</DialogTitle>
         <ArtworkImagePreview src={image.src} alt={image.alt} />
@@ -102,7 +107,7 @@ function ArtworkImagePreview({ src, alt }: { src: string; alt: string }) {
           src={src}
           alt={alt}
           draggable={false}
-          className="block h-auto w-auto max-h-[calc(100dvh_-_2*(1rem_+_var(--photo-padding)_+_1px))] max-w-[calc(100dvw_-_2*(1rem_+_var(--photo-padding)_+_1px))]"
+          className="block h-auto w-auto max-h-[calc(100dvh_-_var(--image-inset))] max-w-[min(76rem,calc(100dvw_-_var(--image-inset)))]"
           style={{ transform: `translate(${view.x}px, ${view.y}px) scale(${view.scale})` }}
         />
       </div>

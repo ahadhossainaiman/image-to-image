@@ -1,8 +1,8 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { ArrowLeft, ArrowRight, BadgeCheck, ShieldCheck, X } from "lucide-react";
-import { useCartDetails, removeFromCart } from "@/lib/cart";
-import { formatPrice, storeCurrency, usdPrice } from "@/lib/currency";
+import { useCartDetails, removeFromCart, syncCartWithWix } from "@/lib/cart";
+import { catalogPrice, formatPrice } from "@/lib/currency";
 import { isWixConfigured, redirectToWixCheckout } from "@/lib/wix";
 
 export const Route = createFileRoute("/cart")({
@@ -23,15 +23,34 @@ function Cart() {
   const [isCheckingOut, setIsCheckingOut] = useState(false);
   const [checkoutError, setCheckoutError] = useState<string | null>(null);
 
-  const allPriced = items.length > 0 && items.every((item) => usdPrice(item) != null);
-  const subtotal = allPriced ? items.reduce((sum, item) => sum + (usdPrice(item) ?? 0), 0) : null;
+  useEffect(() => {
+    function restoreCheckout(event: PageTransitionEvent) {
+      if (!event.persisted) return;
+      setIsCheckingOut(false);
+      setCheckoutError(null);
+      void syncCartWithWix();
+    }
+
+    window.addEventListener("pageshow", restoreCheckout);
+    return () => window.removeEventListener("pageshow", restoreCheckout);
+  }, []);
+
+  const prices = items.map(catalogPrice);
+  const currency = prices[0]?.currency;
+  const subtotal = currency && prices.every((price) => price?.currency === currency)
+    ? prices.reduce((sum, price) => sum + (price?.amount ?? 0), 0)
+    : null;
+  const canCheckout = isWixConfigured() && items.length > 0 && items.every((item) => item.lineItemId);
 
   async function handleCheckout() {
     setIsCheckingOut(true);
     setCheckoutError(null);
-    const result = await redirectToWixCheckout();
-    if (result.error) {
-      setCheckoutError(result.error);
+    try {
+      const result = await redirectToWixCheckout();
+      if (result.error) setCheckoutError(result.error);
+    } catch {
+      setCheckoutError("Unable to start checkout. Please try again.");
+    } finally {
       setIsCheckingOut(false);
     }
   }
@@ -66,16 +85,16 @@ function Cart() {
           <aside className="glass-panel h-fit p-7 lg:sticky lg:top-28">
             <p className="eyebrow">Acquisition summary</p>
             <div className="mt-6 flex items-center justify-between border-b border-border pb-5"><span className="text-sm text-muted-foreground">Selected works</span><span className="font-display text-2xl">{items.length}</span></div>
-            {subtotal != null && <div className="mt-5 flex items-center justify-between border-b border-border pb-5"><span className="text-sm text-muted-foreground">Subtotal ({storeCurrency})</span><span className="text-sm text-accent">{formatPrice({ price: subtotal, currency: storeCurrency })}</span></div>}
+            {subtotal != null && <div className="mt-5 flex items-center justify-between border-b border-border pb-5"><span className="text-sm text-muted-foreground">Subtotal ({currency})</span><span className="text-sm text-accent">{formatPrice({ price: subtotal, currency })}</span></div>}
             <div className="mt-6 space-y-4 text-xs leading-6 text-muted-foreground"><p className="flex gap-3"><ShieldCheck className="mt-1 h-4 w-4 shrink-0 text-primary" strokeWidth={1.1} />White-glove insured delivery quoted for your destination.</p><p className="flex gap-3"><BadgeCheck className="mt-1 h-4 w-4 shrink-0 text-primary" strokeWidth={1.1} />Certificate of Authenticity with each final acquisition.</p></div>
 
             {checkoutError && (
-              <div className="mt-4 rounded border border-destructive/40 bg-destructive/10 p-3 text-xs text-destructive">
+              <div className="mt-4 rounded border border-destructive/40 bg-destructive/10 p-3 text-xs text-destructive" role="alert">
                 {checkoutError}
               </div>
             )}
 
-            {isWixConfigured() && allPriced ? (
+            {canCheckout ? (
               <button
                 type="button"
                 onClick={handleCheckout}
@@ -86,14 +105,9 @@ function Cart() {
               </button>
             ) : (
               <Link to="/contact" className="btn-art mt-8 w-full">
-                Continue to private inquiry <ArrowRight className="h-4 w-4" />
+                Continue to private enquiry <ArrowRight className="h-4 w-4" />
               </Link>
             )}
-            <p className="mt-4 text-center text-[10px] leading-5 text-muted-foreground">
-              {isWixConfigured() && allPriced
-                ? "Protected by Wix Headless secure checkout (Cards, Apple Pay, PayPal)."
-                : "Secure online checkout is being prepared. No payment is taken here."}
-            </p>
           </aside>
         </div>
       )}

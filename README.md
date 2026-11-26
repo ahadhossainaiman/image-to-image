@@ -42,8 +42,33 @@ Set `VITE_GTM_CONTAINER_ID` to the production web container ID. Set
 leave it blank if the same Pixel is configured in the GTM container. Use the GTM
 history-change trigger for client-side navigation if tracking route changes in GTM.
 
-The storefront displays prices received in USD from Wix. Configure USD and the
-approved product amounts in Wix before enabling USD checkout in production.
+The storefront and cart display prices in the currency supplied by Wix. Wix
+Hosted Checkout uses the pricing and payment settings configured in Wix.
+
+## Contact submissions
+
+The contact page submits to the studio's Wix **Enquiry Form** by default.
+The verified field targets are `name`, `email_1139`, `phone_b88d`,
+`inquiry_type`, and `tell_us_your_story`. The optional phone number uses
+international format. When the enquiry comes from a product page, its
+artwork name is included in the story.
+
+To switch forms, set `VITE_WIX_ENQUIRY_FORM_ID` and
+`VITE_WIX_ENQUIRY_FIELD_TARGETS` using `.env.example`, then rebuild.
+If the replacement form has a separate artwork field, include its target
+as `piece` in the mapping.
+
+The contact page and collector-notes footer show confirmation only when
+Wix returns `CONFIRMED`. On `PENDING`, they acknowledge the request. Both
+responses reset the form and show a thank-you message for three seconds.
+Wix requires an app or user identity with the
+Manage form submissions permission to confirm pending records.
+
+The footer submits emails to the studio's Wix **Subscribe Form**. That
+form currently collects email addresses. To opt those contacts into Wix
+Email Marketing, add an email subscription checkbox in Wix Forms and
+set `VITE_WIX_SUBSCRIBE_CONSENT_TARGET` to its field target. The footer
+then submits consent when visitors choose **Subscribe**.
 
 ## Built with
 

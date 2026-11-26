@@ -1,10 +1,18 @@
 import { createFileRoute, useSearch } from "@tanstack/react-router";
 import { useEffect, useRef, useState, type FormEvent } from "react";
-import { ChevronDown, Clock3, Gem, Mail, MessageCircle, Phone, Save, Sparkles } from "lucide-react";
+import { ChevronDown, Clock3, Gem, Mail, MessageCircle, Phone, Send, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { getPageHead } from "@/lib/seo";
+import { enquiryOptions, EnquiryUnavailableError, InvalidEnquiryPhoneError, sendEnquiry } from "@/lib/wix/enquiry";
 
-const inquiryOptions = ["Bespoke Inquiry", "Please Contact Me"] as const;
+// Restore drafts saved before the form supported sending.
+const legacyDraftKey = "thoa-inquiry-draft";
+const submissionErrors = {
+  invalid: "Please complete the required fields.",
+  invalidPhone: "Enter the phone number with its country code, for example +1 813 555 0100.",
+  unavailable: "Online enquiries are unavailable. Please email the studio.",
+  error: "We couldn’t submit your enquiry. Please try again or email the studio.",
+};
 
 export const Route = createFileRoute("/contact")({
   head: () => getPageHead("/contact"),
@@ -14,37 +22,76 @@ export const Route = createFileRoute("/contact")({
 export function Contact() {
   const search: Record<string, unknown> = useSearch({ strict: false });
   const piece = typeof search["piece"] === "string" ? search["piece"] : undefined;
-  const [saved, setSaved] = useState(false);
+  const [submission, setSubmission] = useState<"idle" | "sending" | "sent" | "pending" | keyof typeof submissionErrors>("idle");
+  const submitting = useRef(false);
   const formRef = useRef<HTMLFormElement>(null);
+  const feedback = submission === "idle" || submission === "sending" || submission === "sent" || submission === "pending"
+    ? undefined
+    : submissionErrors[submission];
 
   useEffect(() => {
-    const rawDraft = window.localStorage.getItem("thoa-inquiry-draft");
-    if (!rawDraft) return;
+    if (submission !== "sent" && submission !== "pending") return;
+    const timeout = window.setTimeout(() => setSubmission("idle"), 3000);
+    return () => window.clearTimeout(timeout);
+  }, [submission]);
+
+  useEffect(() => {
     try {
+      const rawDraft = window.localStorage.getItem(legacyDraftKey);
+      if (!rawDraft) return;
       const draft = JSON.parse(rawDraft) as Record<string, unknown>;
-      for (const [name, value] of Object.entries(draft)) {
-        if (name === "piece" && piece) continue;
-        const field = formRef.current?.querySelector(`[name="${name}"]`);
-        if (field instanceof HTMLSelectElement) {
-          if (inquiryOptions.some((option) => option === value)) field.value = String(value);
-        } else if (field instanceof HTMLInputElement || field instanceof HTMLTextAreaElement) {
-          field.value = field instanceof HTMLTextAreaElement && field.maxLength > 0
-            ? String(value).slice(0, field.maxLength)
-            : String(value);
+      for (const name of ["name", "email", "phone", "vision"] as const) {
+        const field = formRef.current?.elements.namedItem(name);
+        const value = draft[name];
+        if (typeof value === "string" && (field instanceof HTMLInputElement || field instanceof HTMLTextAreaElement)) {
+          field.value = field.maxLength > 0 ? value.slice(0, field.maxLength) : value;
         }
       }
-      setSaved(true);
+      const preference = formRef.current?.elements.namedItem("enquiryType");
+      if (preference instanceof HTMLSelectElement && draft["inquiryType"] === enquiryOptions[1]) {
+        preference.value = enquiryOptions[1];
+      }
     } catch {
-      window.localStorage.removeItem("thoa-inquiry-draft");
+      // Browsers may block storage, and old drafts may be invalid.
     }
-  }, [piece]);
+  }, []);
 
-  function saveDraft(event: FormEvent<HTMLFormElement>) {
+  async function submitEnquiry(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
+    if (submitting.current || submission === "pending") return;
     const form = event.currentTarget;
-    const values = Object.fromEntries(new FormData(form).entries());
-    window.localStorage.setItem("thoa-inquiry-draft", JSON.stringify({ ...values, savedAt: new Date().toISOString() }));
-    setSaved(true);
+    const data = new FormData(form);
+    const read = (key: string) => String(data.get(key) ?? "").trim();
+    const enquiry = {
+      name: read("name"),
+      email: read("email"),
+      phone: read("phone"),
+      enquiryType: read("enquiryType"),
+      vision: read("vision"),
+      piece: read("piece"),
+    };
+    if (!enquiry.name || !enquiry.email || !enquiry.vision || !enquiryOptions.some((option) => option === enquiry.enquiryType)) {
+      setSubmission("invalid");
+      return;
+    }
+    submitting.current = true;
+    setSubmission("sending");
+    try {
+      const result = await sendEnquiry(enquiry);
+      form.reset();
+      setSubmission(result === "confirmed" ? "sent" : "pending");
+      try {
+        window.localStorage.removeItem(legacyDraftKey);
+      } catch {
+        // Storage availability is independent of the Wix submission.
+      }
+    } catch (error) {
+      if (error instanceof EnquiryUnavailableError) setSubmission("unavailable");
+      else if (error instanceof InvalidEnquiryPhoneError) setSubmission("invalidPhone");
+      else setSubmission("error");
+    } finally {
+      submitting.current = false;
+    }
   }
 
   return (
@@ -69,27 +116,30 @@ export function Contact() {
             <a href="mailto:Studio@ThyHouseOfArt.com" className="flex items-center gap-2 text-muted-foreground hover:text-accent"><Mail aria-hidden="true" className="size-4 shrink-0 text-primary" /> <span className="[overflow-wrap:anywhere]">Studio@ThyHouseOfArt.com</span></a>
           </address>
         </aside>
-        <form ref={formRef} onSubmit={saveDraft} className="glass-panel min-w-0 p-4 sm:p-6 md:p-10">
+        <form ref={formRef} onSubmit={submitEnquiry} className="glass-panel min-w-0 p-4 sm:p-6 md:p-10">
           {piece && <input type="hidden" name="piece" value={piece} />}
-          <div className="flex items-center justify-between gap-3 border-b border-border pb-3 md:gap-5 md:pb-6"><div><p className="eyebrow">Your vision</p><h2 className="mt-2 text-3xl">Prepare your inquiry</h2></div><span className="hidden text-[9px] uppercase tracking-[.16em] text-muted-foreground sm:block">Private by nature</span></div>
-          <div className="mt-4 grid gap-4 md:mt-7 md:gap-6 sm:grid-cols-2">
+          <div className="flex items-center justify-between gap-3 border-b border-border pb-3 md:gap-5 md:pb-6"><div><p className="eyebrow">Your vision</p><h2 className="mt-2 text-3xl">Prepare your enquiry</h2></div><span className="hidden text-[9px] uppercase tracking-[.16em] text-muted-foreground sm:block">Private by nature</span></div>
+          <fieldset disabled={submission === "sending"} className="mt-4 grid gap-4 md:mt-7 md:gap-6 sm:grid-cols-2">
             <label className="text-[10px] uppercase tracking-[.16em] text-muted-foreground">Your name <span aria-hidden="true" className="text-accent">*</span><input name="name" required autoComplete="name" className="input-art mt-2 max-sm:text-base md:mt-3 normal-case tracking-normal" placeholder="How shall we address you?" /></label>
             <label className="text-[10px] uppercase tracking-[.16em] text-muted-foreground">Email address <span aria-hidden="true" className="text-accent">*</span><input name="email" required type="email" autoComplete="email" className="input-art mt-2 max-sm:text-base md:mt-3 normal-case tracking-normal" placeholder="you@example.com" /></label>
-            <label className="text-[10px] uppercase tracking-[.16em] text-muted-foreground sm:col-span-2">Phone Number<input name="phone" type="tel" autoComplete="tel" className="input-art mt-2 max-sm:text-base md:mt-3 normal-case tracking-normal" placeholder="Enter your phone number" /></label>
+            <label className="text-[10px] uppercase tracking-[.16em] text-muted-foreground sm:col-span-2">Phone Number<input name="phone" type="tel" autoComplete="tel" aria-invalid={submission === "invalidPhone" || undefined} className="input-art mt-2 max-sm:text-base md:mt-3 normal-case tracking-normal" placeholder="+1 813 555 0100" /></label>
             <label className="text-[10px] uppercase tracking-[.16em] text-muted-foreground sm:col-span-2">
-              Inquiry type
+              Enquiry type
               <span className="relative mt-2 block md:mt-3">
-                <select name="inquiryType" defaultValue={inquiryOptions[0]} className="input-art block appearance-none pr-10 normal-case tracking-normal [color-scheme:dark] max-sm:text-base">
-                  {inquiryOptions.map((option) => <option key={option} value={option}>{option}</option>)}
+                <select name="enquiryType" defaultValue={enquiryOptions[0]} className="input-art block appearance-none pr-10 normal-case tracking-normal [color-scheme:dark] max-sm:text-base">
+                  {enquiryOptions.map((option) => <option key={option} value={option}>{option}</option>)}
                 </select>
                 <ChevronDown aria-hidden="true" className="pointer-events-none absolute top-1/2 right-3 size-4 -translate-y-1/2 text-primary" />
               </span>
             </label>
             <label className="text-[10px] uppercase tracking-[.16em] text-muted-foreground sm:col-span-2">Tell us your story <span aria-hidden="true" className="text-accent">*</span><textarea name="vision" required maxLength={1000} rows={6} className="input-art mt-2 max-sm:text-base md:mt-3 h-32 min-h-32 md:h-44 md:min-h-44 resize-y normal-case leading-normal tracking-normal" placeholder="The feeling, scale, materials or occasion you have in mind…" /></label>
-          </div>
-          <Button type="submit" className="btn-art mt-5 md:mt-8 h-auto w-full rounded-none">Save inquiry draft <Save className="h-4 w-4" strokeWidth={1.2} /></Button>
-          <p className="mt-3 text-center text-[10px] md:mt-4 leading-5 text-muted-foreground">This saves a draft on your device only. Direct atelier delivery has not been connected, so no message is sent.</p>
-          {saved && <p className="mt-5 border border-primary/30 bg-primary/10 p-4 text-center text-xs leading-6 text-accent" role="status">Your inquiry draft is saved on this device. No message has been sent.</p>}
+          </fieldset>
+          <Button type="submit" disabled={submission === "sending" || submission === "pending"} className="btn-art mt-5 md:mt-8 h-auto w-full rounded-none">
+            {submission === "sending" ? "Sending…" : "Send Enquiry"} <Send aria-hidden="true" className="h-4 w-4" strokeWidth={1.2} />
+          </Button>
+          {submission === "sent" && <p className="mt-5 border border-primary/30 bg-primary/10 p-4 text-center text-xs leading-6 text-accent" role="status">Thank you. Your enquiry has been submitted.</p>}
+          {submission === "pending" && <p className="mt-5 p-4 text-center text-xs leading-6 text-accent" role="status">Thank you. We received your enquiry request.</p>}
+          {feedback && <p className="mt-4 text-center text-sm text-accent" role="alert">{feedback}</p>}
         </form>
       </div>
     </div>
