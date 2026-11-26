@@ -43,8 +43,8 @@ export function SiteHeader() {
               key={item.to}
               to={item.to}
               preload={item.to === "/shop" ? "intent" : false}
-              className="text-[10px] uppercase tracking-[.2em] text-muted-foreground transition-colors hover:text-accent"
-              activeProps={{ className: "text-accent" }}
+              className="text-[11px] uppercase tracking-[.2em] text-muted-foreground transition-colors hover:text-accent [&.active]:!text-accent [&.active]:font-medium"
+              activeProps={{ className: "!text-accent font-medium" }}
               activeOptions={{ exact: item.to === "/" }}
             >
               {item.label}
