@@ -225,6 +225,11 @@ describe("App routing", () => {
       await screen.findByRole("heading", { name: "The Mushroom Woodland" });
       expect(history.location.pathname).toBe(collectionPath);
       expect(wix.getCollectionBySlug).toHaveBeenCalledTimes(1);
+      const navigation = within(screen.getByRole("navigation", { name: "Main navigation" }));
+      expect(navigation.getByRole("link", { name: "Collections" })).toHaveAttribute("aria-current", "page");
+      fireEvent.click(screen.getByRole("button", { name: "Open menu" }));
+      const mobileNavigation = within(screen.getByRole("navigation", { name: "Mobile navigation" }));
+      expect(mobileNavigation.getByRole("link", { name: /Collections/ })).toHaveAttribute("aria-current", "page");
 
       const oldHistory = createMemoryHistory({ initialEntries: [`/collections/${collection._id}?ref=gallery#works`] });
       const oldRouter = createRouter({ routeTree, history: oldHistory, context: { queryClient: new QueryClient() } });

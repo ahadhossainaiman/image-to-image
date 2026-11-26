@@ -1,4 +1,4 @@
-import { Link } from "@tanstack/react-router";
+import { Link, useLocation } from "@tanstack/react-router";
 import { createPortal } from "react-dom";
 import { useEffect, useRef, useState, type FormEvent } from "react";
 import { ArrowRight, Instagram, LockKeyhole, Menu, ShoppingCart, X } from "lucide-react";
@@ -25,6 +25,9 @@ function Brand({ logoClassName = "h-auto w-30 sm:w-38" }: { logoClassName?: stri
 export function SiteHeader() {
   const cart = useCart();
   const [open, setOpen] = useState(false);
+  const isCollectionDetail = useLocation({
+    select: ({ pathname }) => pathname.startsWith("/collections/") || pathname.startsWith("/artwork/"),
+  });
 
   useEffect(() => {
     if (!open) return;
@@ -43,9 +46,9 @@ export function SiteHeader() {
               key={item.to}
               to={item.to}
               preload={item.to === "/shop" ? "intent" : false}
-              className="text-[12px] uppercase tracking-[.2em] text-muted-foreground transition-colors hover:text-accent [&.active]:!text-accent [&.active]:font-medium"
-              activeProps={{ className: "!text-accent font-medium" }}
-              activeOptions={{ exact: item.to === "/" }}
+              className="text-[12px] uppercase tracking-[.2em] text-muted-foreground transition-colors hover:text-accent aria-[current=page]:font-medium aria-[current=page]:text-accent"
+              aria-current={item.to === "/shop" && isCollectionDetail ? "page" : undefined}
+              activeOptions={{ exact: true, includeSearch: false }}
             >
               {item.label}
             </Link>
@@ -79,8 +82,10 @@ export function SiteHeader() {
                 key={item.to}
                 to={item.to}
                 preload={item.to === "/shop" ? "intent" : false}
-                  onClick={() => setOpen(false)}
-                className="group flex items-center justify-between gap-3 border-b border-border py-3 sm:py-5"
+                onClick={() => setOpen(false)}
+                className="group flex items-center justify-between gap-3 border-b border-border py-3 aria-[current=page]:text-accent sm:py-5"
+                aria-current={item.to === "/shop" && isCollectionDetail ? "page" : undefined}
+                activeOptions={{ exact: true, includeSearch: false }}
               >
                 <span className="flex min-w-0 items-baseline gap-3 sm:gap-5"><span className="text-[9px] tracking-[.2em] text-primary">0{index + 1}</span><span className="font-display text-3xl sm:text-4xl group-hover:text-accent">{item.label}</span></span>
                 <ArrowRight className="h-4 w-4 text-primary" strokeWidth={1} />

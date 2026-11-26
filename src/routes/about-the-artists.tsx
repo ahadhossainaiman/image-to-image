@@ -200,7 +200,7 @@ function AboutTheArtists() {
                 aria-hidden="true"
                 className="absolute inset-x-0 bottom-0 top-0 md:bottom-14 border border-primary/30 lg:bottom-0"
               />
-              <div className="relative isolate aspect-[1287/966] w-full overflow-hidden rounded-t-[45%] bg-forest lg:max-h-[var(--portrait-height)]">
+              <div className="relative isolate aspect-[1287/966] w-full overflow-hidden bg-forest lg:max-h-[var(--portrait-height)]">
                 <img
                   src={creator.image}
                   alt={creator.imageAlt}
