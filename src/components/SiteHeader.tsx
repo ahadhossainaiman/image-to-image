@@ -43,7 +43,7 @@ export function SiteHeader() {
               key={item.to}
               to={item.to}
               preload={item.to === "/shop" ? "intent" : false}
-              className="text-[11px] uppercase tracking-[.2em] text-muted-foreground transition-colors hover:text-accent [&.active]:!text-accent [&.active]:font-medium"
+              className="text-[12px] uppercase tracking-[.2em] text-muted-foreground transition-colors hover:text-accent [&.active]:!text-accent [&.active]:font-medium"
               activeProps={{ className: "!text-accent font-medium" }}
               activeOptions={{ exact: item.to === "/" }}
             >
@@ -139,7 +139,7 @@ export function SiteFooter() {
             <div className="mt-3 flex items-center gap-2 md:mt-7 md:gap-3 text-[10px] uppercase tracking-[.17em] text-muted-foreground"><LockKeyhole className="h-3.5 w-3.5 text-primary" strokeWidth={1.2} /> A SECURE COLLECTOR'S EXPERIENCE</div>
           </div>
           <div>
-            <p className="eyebrow">The atelier</p>
+            <p className="eyebrow text-[12px]">The atelier</p>
             <div className="mt-4 flex flex-col items-start gap-1 text-sm text-muted-foreground md:mt-6 md:gap-4">
               {nav.map((item) => <Link key={item.to} to={item.to} className="flex min-h-8 items-center transition-colors hover:text-accent md:min-h-0">{item.label}</Link>)}
               <a
@@ -154,7 +154,7 @@ export function SiteFooter() {
             </div>
           </div>
           <div>
-            <p className="eyebrow">Collector notes</p>
+            <p className="eyebrow text-[12px]">Collector notes</p>
             <p className="mt-2 font-display text-2xl md:mt-5 md:text-3xl leading-tight">New works, private previews{" "}<br className="hidden md:block" />and stories from the atelier.</p>
             <form className="mt-2 flex border-b md:mt-6 border-primary/35" onSubmit={handleNewsletter} onChange={() => {
               if (signup === "error") setSignup("idle");

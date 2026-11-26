@@ -109,13 +109,13 @@ function AboutTheArtists() {
             strokeWidth={0.5}
           />
         </div>
-        <p className="eyebrow flex items-center gap-4 max-[360px]:gap-2">
+        <p className="eyebrow flex items-center gap-4 text-[14px] max-[360px]:gap-2">
           <span className="h-px w-10 bg-primary/50 max-[360px]:w-7" />
           Discover the beauty within™
         </p>
         <div className="relative mt-4 grid items-end gap-3 md:mt-9 md:gap-9 lg:grid-cols-[1.4fr_.6fr]">
           <div>
-            <p className="mb-2 text-[10px] md:mb-4 uppercase tracking-[.3em] text-muted-foreground">
+            <p className="mb-2 text-[14px] md:mb-4 uppercase tracking-[.3em] text-muted-foreground">
               About the artists
             </p>
             <h1 className="max-w-4xl text-[clamp(2.5rem,9vw,3.75rem)] leading-[.94] sm:text-8xl lg:text-[7.5rem]">
@@ -165,7 +165,7 @@ function AboutTheArtists() {
             {/* The extra height accounts for the figure frame, caption, and sticky scroll travel. */}
             <div className="relative border border-primary/25 bg-secondary px-4 py-5 text-foreground shadow-[0_24px_70px_-36px_rgba(0,0,0,0.5)] sm:p-7 md:p-12 lg:-mr-3 lg:min-h-[calc(var(--portrait-height)_+_11rem)] lg:py-16 lg:pr-16">
               <div className="flex items-center justify-between border-b border-primary/20 pb-3 md:pb-5">
-                <p className="text-[9px] uppercase tracking-[.25em] text-primary">
+                <p className="text-[14px] uppercase tracking-[.25em] text-primary">
                   Meet the artist
                 </p>
                 <span className="font-display text-3xl italic text-primary/65">0{index + 1}</span>
@@ -181,7 +181,7 @@ function AboutTheArtists() {
                 <Sparkles className="h-4 w-4 text-primary" strokeWidth={1} />
               </div>
               <div className="space-y-3 text-sm leading-relaxed md:space-y-5 md:leading-8 text-foreground/80">
-                <p className="text-[9px] uppercase tracking-[.2em] text-primary/80">
+                <p className="text-[14px] uppercase tracking-[.2em] text-primary/80">
                   {creator.sampleBiography ? "Biography" : "Biography"}
                 </p>
                 {creator.biography}
@@ -212,7 +212,7 @@ function AboutTheArtists() {
                   className="absolute inset-0 bg-gradient-to-t from-forest via-forest/10 to-forest/10"
                 />
               </div>
-              <figcaption className="relative flex flex-wrap items-center justify-between gap-x-3 gap-y-1 py-3 md:py-5 text-[8px] uppercase tracking-[.2em] text-muted-foreground sm:text-[9px]">
+              <figcaption className="relative flex flex-wrap items-center justify-between gap-x-3 gap-y-1 py-3 text-[14px] uppercase tracking-[.2em] text-muted-foreground md:py-5">
                 <span>{creator.imageCaption}</span>
                 <span className="text-primary">Thy House Of Art / 0{index + 1}</span>
               </figcaption>
@@ -224,20 +224,20 @@ function AboutTheArtists() {
       <section className="mx-auto mt-6 max-w-[1400px] px-4 text-center sm:px-10 md:mt-32">
         <div className="border-y border-border px-3 py-6 md:px-4 md:py-16">
           <Flower2 aria-hidden="true" className="mx-auto h-8 w-8 text-primary" strokeWidth={0.8} />
-          <p className="eyebrow mt-3 md:mt-6">From our world to yours</p>
+          <p className="eyebrow mt-3 text-[14px] md:mt-6">From our world to yours</p>
           <h2 className="mt-3 text-3xl sm:text-6xl md:mt-5">
             The story continues
             <br />
             <em className="text-accent">in every creation.</em>
           </h2>
           <div className="mt-5 flex flex-wrap items-center justify-center gap-3 md:mt-8 md:gap-10">
-            <Link to="/shop" className="btn-art">
+            <Link to="/shop" className="btn-art text-[13px]">
               Explore the collection{" "}
               <ArrowUpRight aria-hidden="true" className="h-4 w-4" strokeWidth={1.2} />
             </Link>
             <Link
               to="/atelier-story"
-              className="flex items-center gap-3 border-b border-primary/40 py-2 text-[10px] uppercase tracking-[.16em] text-primary transition-colors hover:text-accent"
+              className="flex items-center gap-3 border-b border-primary/40 py-2 text-[13px] uppercase tracking-[.16em] text-primary transition-colors hover:text-accent"
             >
               Our atelier story{" "}
               <ArrowUpRight aria-hidden="true" className="h-4 w-4" strokeWidth={1.2} />

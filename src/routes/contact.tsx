@@ -97,7 +97,7 @@ export function Contact() {
   return (
     <div className="mx-auto max-w-[1300px] px-4 pt-8 pb-4 sm:px-10 md:py-16 lg:py-24">
       <header className="mx-auto max-w-3xl text-center">
-        <div className="botanical-rule mx-auto w-fit eyebrow">Private commissions</div>
+        <div className="botanical-rule mx-auto w-fit eyebrow text-[14px]">Private commissions</div>
         <h1 className="mt-3 text-[clamp(2.5rem,9vw,3.75rem)] md:mt-6 leading-[.95] sm:text-7xl">Let us imagine<br /><em className="text-accent">something together.</em></h1>
         <p className="mx-auto mt-3 max-w-xl text-sm leading-relaxed md:mt-7 md:leading-7 text-muted-foreground">Tell us about the artwork that caught your eye, your space, or the story you would like us to bring to life.</p>
       </header>
@@ -118,7 +118,7 @@ export function Contact() {
         </aside>
         <form ref={formRef} onSubmit={submitEnquiry} className="glass-panel min-w-0 p-4 sm:p-6 md:p-10">
           {piece && <input type="hidden" name="piece" value={piece} />}
-          <div className="flex items-center justify-between gap-3 border-b border-border pb-3 md:gap-5 md:pb-6"><div><p className="eyebrow">Your vision</p><h2 className="mt-2 text-3xl">Prepare your enquiry</h2></div><span className="hidden text-[9px] uppercase tracking-[.16em] text-muted-foreground sm:block">Private by nature</span></div>
+          <div className="flex items-center justify-between gap-3 border-b border-border pb-3 md:gap-5 md:pb-6"><div><p className="eyebrow text-[14px]">Your vision</p><h2 className="mt-2 text-3xl">Prepare your enquiry</h2></div><span className="hidden text-[9px] uppercase tracking-[.16em] text-muted-foreground sm:block">Private by nature</span></div>
           <fieldset disabled={submission === "sending"} className="mt-4 grid gap-4 md:mt-7 md:gap-6 sm:grid-cols-2">
             <label className="text-[10px] uppercase tracking-[.16em] text-muted-foreground">Your name <span aria-hidden="true" className="text-accent">*</span><input name="name" required autoComplete="name" className="input-art mt-2 max-sm:text-base md:mt-3 normal-case tracking-normal" placeholder="How shall we address you?" /></label>
             <label className="text-[10px] uppercase tracking-[.16em] text-muted-foreground">Email address <span aria-hidden="true" className="text-accent">*</span><input name="email" required type="email" autoComplete="email" className="input-art mt-2 max-sm:text-base md:mt-3 normal-case tracking-normal" placeholder="you@example.com" /></label>
@@ -134,7 +134,7 @@ export function Contact() {
             </label>
             <label className="text-[10px] uppercase tracking-[.16em] text-muted-foreground sm:col-span-2">Tell us your story <span aria-hidden="true" className="text-accent">*</span><textarea name="vision" required maxLength={1000} rows={6} className="input-art mt-2 max-sm:text-base md:mt-3 h-32 min-h-32 md:h-44 md:min-h-44 resize-y normal-case leading-normal tracking-normal" placeholder="The feeling, scale, materials or occasion you have in mind…" /></label>
           </fieldset>
-          <Button type="submit" disabled={submission === "sending" || submission === "pending"} className="btn-art mt-5 md:mt-8 h-auto w-full rounded-none">
+          <Button type="submit" disabled={submission === "sending" || submission === "pending"} className="btn-art mt-5 md:mt-8 h-auto w-full rounded-none text-[13px]">
             {submission === "sending" ? "Sending…" : "Send Enquiry"} <Send aria-hidden="true" className="h-4 w-4" strokeWidth={1.2} />
           </Button>
           {submission === "sent" && <p className="mt-5 border border-primary/30 bg-primary/10 p-4 text-center text-xs leading-6 text-accent" role="status">Thank you. Your enquiry has been submitted.</p>}

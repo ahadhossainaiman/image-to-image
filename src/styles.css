@@ -159,7 +159,7 @@
   background: var(--gradient-gold);
   color: var(--color-primary-foreground);
   box-shadow: var(--shadow-gold);
-  font-size: 0.64rem;
+  font-size: 13px;
   font-weight: 500;
   letter-spacing: 0.2em;
   text-transform: uppercase;
@@ -178,7 +178,7 @@
   border: 1px solid var(--color-border);
   background: oklch(0.96 0.015 88 / 0.035);
   color: var(--color-foreground);
-  font-size: 0.64rem;
+  font-size: 13px;
   font-weight: 400;
   letter-spacing: 0.2em;
   text-transform: uppercase;
@@ -206,7 +206,7 @@
   border: 1px solid var(--color-border);
   padding: .65rem 1rem;
   color: var(--color-muted-foreground);
-  font-size: .62rem;
+  font-size: 11px;
   letter-spacing: .14em;
   text-transform: uppercase;
   transition: color .25s ease, background .25s ease, border-color .25s ease;

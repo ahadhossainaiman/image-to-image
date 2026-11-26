@@ -46,7 +46,7 @@ function Shop() {
     <div className="mx-auto max-w-[1500px] px-4 pt-8 pb-4 sm:px-10 md:pt-16 md:pb-16 lg:pt-24">
       <header className="grid gap-3 border-b border-border pb-5 md:gap-8 md:pb-12 lg:grid-cols-[1.2fr_.8fr] lg:items-end">
         <div>
-          <p className="eyebrow">The gallery</p>
+          <p className="eyebrow text-[14px]">The gallery</p>
           <h1 className="mt-3 max-w-4xl text-[clamp(2.5rem,9vw,3.75rem)] md:mt-5 leading-[.95] sm:text-7xl lg:text-8xl">Singular works,<br /><em className="text-accent">quietly extraordinary.</em></h1>
         </div>
         <p className="max-w-md text-sm leading-relaxed text-muted-foreground md:leading-7 lg:justify-self-end">Each piece is made once, by hand. Enter a collection to discover its textures, details and story.</p>

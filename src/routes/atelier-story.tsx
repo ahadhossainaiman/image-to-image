@@ -14,7 +14,7 @@ function AtelierStory() {
     <>
       <section className="mx-auto grid max-w-[1400px] items-start gap-5 px-4 pt-8 pb-4 sm:px-10 md:gap-14 md:py-16 lg:grid-cols-[1fr_.9fr] lg:py-24">
         <div>
-          <p className="eyebrow">The atelier story</p>
+          <p className="eyebrow text-[14px]">The atelier story</p>
           <h1 className="mt-3 text-5xl md:mt-6 leading-[.95] sm:text-7xl lg:text-8xl">A house of<br /><em className="text-accent">wonder.</em></h1>
           <p className="mt-4 max-w-xl font-display text-xl md:mt-8 md:text-2xl italic leading-snug text-foreground"> Atelier (pronounced <em>ah-tell-YAY</em>) is a French word meaning a creative workspace or studio where designers and artisans imagine, develop, and bring beautiful, distinctive things to life.</p>
           <p className="mt-5 max-w-xl text-sm leading-relaxed md:mt-10 md:leading-7 text-muted-foreground">Thy House Of Art is an independent art studio devoted to one-of-a-kind handmade creations. Our world brings together celestial figures, botanical imagination and the meditative artistry of embroidery.</p>
@@ -42,10 +42,10 @@ function AtelierStory() {
         <img src={forestHero} alt="A fairy sculpture in the enchanted forest world of Thy House Of Art" loading="lazy" width={1920} height={1280} className="absolute inset-0 h-full w-full object-cover" />
         <div className="absolute inset-0 bg-background/55" />
         <div className="glass-panel relative mx-auto max-w-2xl p-5 text-center sm:p-9 md:my-24 md:p-14">
-          <p className="eyebrow">Our philosophy</p>
+          <p className="eyebrow text-[14px]">Our philosophy</p>
           <blockquote className="mt-3 font-display text-3xl md:mt-6 italic leading-tight sm:text-5xl">“Artwork is the star of the show.”</blockquote>
           <p className="mx-auto mt-3 max-w-md text-sm leading-relaxed md:mt-6 md:leading-7 text-muted-foreground">GREAT ART ELEVATES EMOTION, AWAKENS IMAGINATION, AND BRINGS LIGHT TO OUR INNER WORLD AND THE SPACES WE INHABIT.</p>
-          <Link to="/shop" className="btn-art mt-5 md:mt-8">Enter the gallery <ArrowRight className="h-4 w-4" /></Link>
+          <Link to="/shop" className="btn-art mt-5 md:mt-8 text-[13px]">Enter the gallery <ArrowRight className="h-4 w-4" /></Link>
         </div>
       </section>
     </>

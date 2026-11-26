@@ -114,7 +114,7 @@ export function CollectorReviewsSection({ reviews }: CollectorReviewsSectionProp
       {/* Editorial Header */}
       <div className="flex flex-col gap-8 border-b border-border/50 pb-5 md:flex-row md:items-end md:justify-between md:pb-10">
         <div className="max-w-2xl">
-          <div className="botanical-rule w-fit eyebrow">REFLECTIONS FROM OUR COLLECTORS</div>
+          <div className="botanical-rule w-fit eyebrow text-[14px]">REFLECTIONS FROM OUR COLLECTORS</div>
           <h2
             id="collector-reflections-heading"
             className="mt-4 text-4xl leading-[1.02] sm:text-6xl md:mt-6 lg:text-7xl"
