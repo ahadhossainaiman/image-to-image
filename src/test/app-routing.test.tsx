@@ -318,7 +318,7 @@ describe("App routing", () => {
       expect(screen.getByText("MUSH-S")).toBeInTheDocument();
       expect(screen.getByText("Out of stock")).toBeInTheDocument();
       expect(within(screen.getByRole("main")).getByText("0")).toBeInTheDocument();
-      expect(screen.getByRole("button", { name: "Open shopping cart with 0 items" })).toHaveTextContent("0Cart");
+      expect(screen.getByRole("button", { name: "Open shopping cart with 0 items" })).toHaveTextContent("0");
       expect(screen.queryByText(/\$900|Size: Hidden/)).not.toBeInTheDocument();
       const description = within(screen.getByRole("region", { name: "About this work" }));
       expect(description.getByText("Handmade & embroidered.").tagName).toBe("STRONG");

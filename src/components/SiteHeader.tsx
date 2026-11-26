@@ -53,12 +53,11 @@ export function SiteHeader() {
         </nav>
         <div className="flex shrink-0 items-center gap-1 sm:gap-4">
           <CartDrawer>
-            <button type="button" aria-label={`Open shopping cart with ${cart.length} ${cart.length === 1 ? "item" : "items"}`} className="flex h-11 cursor-pointer items-end gap-1 px-2.5 pb-2 text-accent transition-colors hover:text-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent sm:h-12 sm:px-3.5">
+            <button type="button" aria-label={`Open shopping cart with ${cart.length} ${cart.length === 1 ? "item" : "items"}`} className="flex h-11 cursor-pointer items-center justify-center px-2 text-accent transition-colors hover:text-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent sm:h-12 sm:px-2.5">
               <span aria-hidden="true" className="relative h-8 w-8 shrink-0">
                 <ShoppingCart className="absolute inset-x-0 bottom-0 h-7 w-8" strokeWidth={2.3} />
                 <span className="absolute top-0 right-0.5 px-0.5 text-xs leading-none font-bold tabular-nums">{cart.length}</span>
               </span>
-              <span aria-hidden="true" className="pb-0.5 text-xs leading-none font-normal">Cart</span>
             </button>
           </CartDrawer>
           <button className="flex size-11 items-center justify-center lg:hidden" aria-label="Open menu" onClick={() => setOpen(true)}>
