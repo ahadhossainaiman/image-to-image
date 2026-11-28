@@ -219,7 +219,7 @@ function ArtworkPage() {
             <CertificateStatement className="gap-2 leading-5 tracking-[.08em]" />
             <div className="flex gap-2 text-xs leading-5 text-muted-foreground">
               <ShieldCheck className="mt-0.5 h-4 w-4 shrink-0 text-primary" strokeWidth={1.1} />
-              <p>One of a kind. Insured white-glove delivery is arranged and quoted privately.</p>
+              <p>One of a kind. Insured white-glove delivery is arranged. A signature will be required upon delivery.</p>
             </div>
           </div>
         </aside>

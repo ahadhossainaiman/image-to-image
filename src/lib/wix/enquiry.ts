@@ -1,7 +1,7 @@
 import { isWixConfigured } from "./client";
 import { submitWixForm } from "./form-submissions";
 
-export const enquiryOptions = ["Bespoke Enquiry", "Please Contact Me"] as const;
+export const enquiryOptions = ["Bespoke enquiry", "I have a question and would love you to contact me"] as const;
 
 const studioFormId = "812d9a26-54a4-4f06-81ce-87c0a6314de8";
 const fields = ["name", "email", "phone", "enquiryType", "vision"] as const;
