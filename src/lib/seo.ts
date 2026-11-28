@@ -3,28 +3,33 @@ const siteName = "Thy House Of Art";
 
 export const seoPages = {
   "/": {
-    title: "Thy House Of Art | Handmade Angel & Fairy Art",
-    description: "Discover one-of-a-kind handmade angel and fairy sculptures, woodland art and hand-embroidered merino wool works from Thy House Of Art.",
+    title: "Thy House of Art | Handmade Angel & Fairy Art",
+    description: "Explore Thy House of Art. Discover one-of-a-kind handmade angel sculptures, mystical fairies, and original hand-embroidered merino wool art creations.",
+    keywords: "thy house of art",
     type: "WebPage",
   },
   "/shop": {
-    title: "Handmade Art Collections & Gallery | Thy House Of Art",
-    description: "Browse the Thy House Of Art gallery for one-of-a-kind angel and fairy sculptures, woodland pieces and hand-embroidered merino wool artworks.",
+    title: "Original Handmade Art Collections | Thy House of Art",
+    description: "Browse original handmade art collections. Discover one-of-a-kind angel and fairy sculptures, woodland pieces, and bespoke merino wool fiber artworks.",
+    keywords: "original handmade art collections",
     type: "CollectionPage",
   },
   "/atelier-story": {
-    title: "Our Atelier Story & Handmade Process | Thy House Of Art",
-    description: "Discover how Thy House Of Art shapes, stitches and finishes each original sculpture and textile artwork by hand, one piece at a time.",
+    title: "Thy House of Art Atelier Story | Our Process",
+    description: "Discover the Thy House of Art atelier story. Learn how each original fairy and angel sculpture is shaped and detailed by hand using fine merino wool.",
+    keywords: "thy house of art atelier story",
     type: "AboutPage",
   },
   "/about-the-artists": {
-    title: "Meet Artists Alba & Zev Amóre | Thy House Of Art",
-    description: "Meet Alba Amóre and Zev Amóre, the artists behind Thy House Of Art, and explore the stories and inspirations behind the independent atelier.",
+    title: "Thy House of Art Artists | Alba & Zev Amóre",
+    description: "Meet the Thy House of Art artists, Alba Amóre and Zev Amóre. Explore their story, inspirations, and passion for sculpting one-of-a-kind ethereal art.",
+    keywords: "thy house of art artists",
     type: "AboutPage",
   },
   "/contact": {
-    title: "Bespoke Art Commissions & Enquiries | Thy House Of Art",
-    description: "Contact Thy House Of Art about acquiring an original piece or commissioning a bespoke handmade artwork for a collection, gift or special occasion.",
+    title: "Contact Thy House of Art | Art Commissions",
+    description: "Contact Thy House of Art to commission a bespoke angel sculpture, acquire available fairy art, or inquire about custom handmade merino wool creations.",
+    keywords: "contact thy house of art",
     type: "ContactPage",
   },
 } as const;
@@ -74,6 +79,7 @@ export function buildPageHead(path: SeoPath, origin: string) {
     title: page.title,
     attributes: {
       description: page.description,
+      ...("keywords" in page && { keywords: page.keywords }),
       "og:type": "website",
       "og:site_name": siteName,
       "og:title": page.title,

@@ -5,6 +5,7 @@ import forestHero from "@/assets/enchanted-forest-hero.jpg";
 import angelDetail from "@/assets/angel-2.jpg";
 import { getCategories, getCollectorReviews } from "@/lib/wix";
 import { CollectorReviewsSection } from "@/components/CollectorReviewsSection";
+import { CertificateStatement } from "@/components/CertificateStatement";
 import { CollectionImage } from "@/components/CollectionImage";
 import { getPageHead } from "@/lib/seo";
 
@@ -216,6 +217,7 @@ function Index() {
               View all works <ArrowUpRight className="h-4 w-4" />
             </Link>
           </div>
+          <CertificateStatement className="mx-auto mt-4 w-fit max-w-lg text-left sm:mt-6" />
         </div>
       </section>
 
